@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>互動元素 Interaction Elements：可動手玩的 HCI 第三章</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef1f4; --surface:#ffffff; --surface2:#f6f8fa; --ink:#18212b; --muted:#566370; --line:#d5dce3;
+  --control:#c97800; --control-soft:#fbeed6; --display:#0c7f82; --display-soft:#d7eeee;
+  --accent:#2b3a67; --on-accent:#ffffff; --bad:#b83227; --bad-soft:#f8dfdb; --good:#237a4b; --good-soft:#dcf1e5;
+  --shadow:0 1px 2px rgba(20,30,45,.06),0 6px 18px rgba(20,30,45,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1317; --surface:#171e25; --surface2:#1d262e; --ink:#e7ecf0; --muted:#9aa8b4; --line:#2c3743;
+    --control:#f0a52e; --control-soft:#3a2c12; --display:#3cc3c6; --display-soft:#12383a;
+    --accent:#9db0ee; --on-accent:#0e1317; --bad:#ff7d6e; --bad-soft:#3d1c19; --good:#58d08c; --good-soft:#123222;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1317; --surface:#171e25; --surface2:#1d262e; --ink:#e7ecf0; --muted:#9aa8b4; --line:#2c3743;
+  --control:#f0a52e; --control-soft:#3a2c12; --display:#3cc3c6; --display-soft:#12383a;
+  --accent:#9db0ee; --on-accent:#0e1317; --bad:#ff7d6e; --bad-soft:#3d1c19; --good:#58d08c; --good-soft:#123222;
+  --shadow:none;
+}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",system-ui,sans-serif;line-height:1.75;font-size:16px;-webkit-text-size-adjust:100%}
+button,select,input{font:inherit;color:inherit}
+h1,h2,h3,h4{line-height:1.3;margin:0}
+p{margin:.6em 0}
+em{font-style:normal;color:var(--muted);font-weight:400;font-size:.8em;margin-left:.4em}
+kbd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85em;background:var(--surface2);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 .4em}
+.layout{display:grid;grid-template-columns:1fr;max-width:1180px;margin:0 auto;padding:0 16px 80px}
+@media(min-width:1000px){.layout{grid-template-columns:210px minmax(0,1fr);gap:40px}}
+/* nav */
+.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);margin:0 -16px;padding:8px 16px;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;align-self:start;scrollbar-width:none}
+.toc::-webkit-scrollbar{display:none}
+.toc .toc-title{display:none}
+.toc a{flex:none;color:var(--muted);text-decoration:none;padding:5px 11px;border-radius:999px;font-size:14px;white-space:nowrap}
+.toc a.on{background:var(--accent);color:var(--on-accent)}
+@media(min-width:1000px){
+  .toc{flex-direction:column;margin:0;padding:28px 0;border:0;overflow:visible;top:calc(env(safe-area-inset-top,0px) + 8px)}
+  .toc .toc-title{display:block;font-weight:700;margin-bottom:8px;font-size:15px}
+  .toc a{border-radius:8px;padding:6px 10px;white-space:normal}
+  .toc a:hover{background:var(--surface2)}
+}
+/* hero */
+.hero{padding:44px 0 12px}
+.hero h1{font-size:clamp(30px,6vw,52px);font-weight:900;letter-spacing:-.01em}
+.hero .lede{max-width:40em;color:var(--muted);font-size:17px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0;font-size:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.chip.c i{background:var(--control)} .chip.d i{background:var(--display)}
+/* chapters */
+.chapter{padding-top:56px}
+.ch-head h2{font-size:clamp(24px,4vw,32px);font-weight:900;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.ch-no{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:10px;background:var(--accent);color:var(--on-accent);font-size:20px;font-weight:700}
+.ch-head p{color:var(--muted);max-width:44em}
+.sub{margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
+.sub h3{font-size:21px;font-weight:700}
+.sub h3 em{font-size:14px}
+.example{border-left:4px solid var(--control);background:var(--control-soft);padding:10px 14px;border-radius:0 10px 10px 0;margin:12px 0;font-size:15px}
+.example b{margin-right:6px}
+.keypoint{border-left:4px solid var(--display);background:var(--display-soft);padding:10px 14px;border-radius:0 10px 10px 0;margin:12px 0;font-size:15px}
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0;box-shadow:var(--shadow)}
+.demo>h4{font-size:15px;font-weight:700;margin-bottom:10px;color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+.row>*{flex:1 1 260px;min-width:0}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 13px;cursor:pointer;min-height:36px}
+.btn:hover{background:var(--surface2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn:focus-visible,.hard:focus-visible,[tabindex]:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--display);outline-offset:2px}
+.readout{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px;min-height:42px;margin:10px 0 0}
+.note{color:var(--muted);font-size:14px}
+.good{color:var(--good)} .bad{color:var(--bad)}
+.tag-c{color:var(--control);font-weight:700} .tag-d{color:var(--display);font-weight:700}
+label.inline{display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin-right:12px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+table.mini{border-collapse:collapse;width:100%;font-size:14px}
+table.mini th,table.mini td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+/* hero loop */
+.loop{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.node{flex:1 1 140px;border:2px solid var(--line);border-radius:12px;padding:12px;background:var(--surface);transition:.25s}
+.node b{display:block;font-size:17px}
+.node span{font-size:13px;color:var(--muted)}
+.node.c{border-color:var(--control)} .node.d{border-color:var(--display)}
+.node.lit{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.15)}
+.node.c.lit{background:var(--control-soft)} .node.d.lit{background:var(--display-soft)} .node.h.lit,.node.m.lit{background:var(--surface2);border-color:var(--accent)}
+.back{margin-top:8px;border:2px dashed var(--line);border-radius:12px;padding:8px 14px;font-size:14px;color:var(--muted);transition:.25s}
+.back.lit{border-color:var(--display);color:var(--ink);background:var(--display-soft)}
+.band{display:flex;height:34px;border-radius:8px;overflow:hidden;margin:8px 0;font-size:13px}
+.band div{display:grid;place-items:center;color:#fff;white-space:nowrap}
+/* 1.1 hard controls */
+.hard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px}
+.hard{background:linear-gradient(#e8ebee,#c5cbd1);border:1px solid #98a2ab;border-radius:12px;padding:12px 8px;cursor:pointer;color:#222;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px}
+.hard .k{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#666,#222);position:relative;transition:transform .25s}
+.hard .k::after{content:"";position:absolute;left:50%;top:5px;width:4px;height:12px;background:#f5b041;transform:translateX(-50%);border-radius:2px}
+.hard .sw{width:30px;height:48px;border-radius:6px;background:#333;position:relative}
+.hard .sw::after{content:"";position:absolute;left:4px;right:4px;height:20px;background:#ddd;border-radius:4px;top:4px;transition:.2s}
+.hard .sw.on::after{top:24px}
+.hard .kc{width:60px;height:38px;border-radius:7px;background:#f6f6f6;border:2px solid #555;display:grid;place-items:center;font-weight:700;font-size:13px}
+.hard .js{width:46px;height:46px;position:relative}
+.hard .js::before{content:"";position:absolute;left:50%;bottom:0;width:6px;height:36px;background:#333;transform-origin:bottom center;transform:translateX(-50%) rotate(var(--tilt,0deg));border-radius:3px;transition:transform .2s}
+.hard .js::after{content:"";position:absolute;left:50%;bottom:0;width:30px;height:12px;background:#555;transform:translateX(-50%);border-radius:6px}
+/* 1.2 toolbar and scrollbar */
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#dfe3e7;border:1px solid #aab2ba;border-radius:8px;padding:6px;color:#222}
+.toolbar select{background:#fff;border:1px solid #9aa3ab;border-radius:4px;padding:2px 4px;color:#222}
+.toolbar .tgl{width:32px;height:30px;border:1px solid transparent;background:transparent;border-radius:4px;cursor:pointer;color:#222}
+.toolbar .tgl.on{background:#fff;border-color:#6a7783;box-shadow:inset 0 0 0 1px #6a7783}
+.doc{padding:14px;border:1px dashed var(--line);border-radius:8px;margin-top:10px;font-size:16px}
+.seg{cursor:pointer;padding:2px 4px;border-radius:4px;margin-right:8px}
+.seg.sel{outline:2px solid var(--control);background:var(--control-soft)}
+.sb-wrap{display:flex;height:190px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface2)}
+.sb-view{flex:1;overflow:auto;scrollbar-width:none;padding:6px 10px;font-size:14px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.sb-view::-webkit-scrollbar{display:none}
+.sb-track{width:20px;background:var(--line);position:relative;touch-action:none}
+.sb-thumb{position:absolute;left:2px;right:2px;top:0;border-radius:5px;background:var(--control);cursor:grab;touch-action:none}
+/* pads and screens */
+.pad{position:relative;aspect-ratio:3/2;width:100%;max-width:300px;border:2px solid var(--control);border-radius:12px;background:var(--control-soft);touch-action:none;overflow:hidden;cursor:crosshair}
+.pad .lbl{position:absolute;left:8px;top:6px;font-size:13px;color:var(--control);font-weight:700;pointer-events:none}
+.pad .pdot{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--control);pointer-events:none;left:50%;top:50%}
+.scr{position:relative;aspect-ratio:3/2;width:100%;max-width:420px;border:6px solid #2a323a;border-radius:8px;background:var(--display-soft);overflow:hidden;touch-action:none}
+.scr .lbl{position:absolute;right:8px;top:4px;font-size:13px;color:var(--display);font-weight:700;pointer-events:none}
+.cursor{position:absolute;width:0;height:0;pointer-events:none;z-index:3;left:0;top:0}
+.cursor::before{content:"";position:absolute;left:0;top:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid var(--ink);transform:rotate(-30deg);transform-origin:0 0}
+.tgt{position:absolute;border-radius:50%;background:var(--bad);opacity:.85;transform:translate(-50%,-50%)}
+/* cube */
+.stage{height:240px;perspective:700px;display:grid;place-items:center;background:var(--surface2);border-radius:10px;overflow:hidden}
+.cube{width:80px;height:80px;position:relative;transform-style:preserve-3d;transition:transform .05s}
+.face{position:absolute;inset:0;border:2px solid var(--display);background:color-mix(in srgb,var(--display) 28%,transparent);display:grid;place-items:center;font-weight:700;color:var(--ink)}
+.f1{transform:translateZ(40px)} .f2{transform:rotateY(180deg) translateZ(40px)} .f3{transform:rotateY(90deg) translateZ(40px)} .f4{transform:rotateY(-90deg) translateZ(40px)} .f5{transform:rotateX(90deg) translateZ(40px)} .f6{transform:rotateX(-90deg) translateZ(40px)}
+.dofs{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;align-items:center;font-size:14px}
+.dofs input:disabled{opacity:.35}
+canvas.draw{width:100%;max-width:320px;height:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface2);touch-action:none}
+/* knobs, sliders, bars */
+.knob{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#778,#223);position:relative;touch-action:none;cursor:grab;margin:auto}
+.knob::after{content:"";position:absolute;left:50%;top:7px;width:6px;height:22px;background:#f5b041;border-radius:3px;transform:translateX(-50%)}
+.vs{position:relative;width:40px;height:150px;touch-action:none;cursor:pointer;margin:auto}
+.vs::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:6px;background:var(--line);transform:translateX(-50%);border-radius:3px}
+.vs i{position:absolute;left:3px;right:3px;height:18px;background:var(--control);border-radius:5px;margin-top:-9px}
+.bar{position:relative;width:34px;height:150px;border:2px solid var(--display);border-radius:6px;margin:auto;overflow:hidden;background:var(--surface2)}
+.bar i{position:absolute;left:0;right:0;bottom:0;background:var(--display);height:20%}
+/* switch & elevator */
+.plate{width:70px;height:110px;background:#e8e8e8;border:2px solid #aaa;border-radius:8px;margin:auto;display:grid;place-items:center;cursor:pointer}
+.plate i{width:26px;height:56px;border-radius:5px;background:#999;border:2px solid #666;transition:transform .2s;display:block}
+.plate.up i{transform:translateY(-14px)} .plate.down i{transform:translateY(14px)}
+.bulb{font-size:64px;text-align:center;transition:.3s;filter:grayscale(1) brightness(.6)}
+.bulb.on{filter:none;text-shadow:0 0 30px #ffd34e}
+.elev{width:100px;background:#8e969d;border-radius:8px;padding:10px;display:grid;gap:10px;margin:auto}
+.elev button{height:42px;border-radius:50%;border:2px solid #444;background:radial-gradient(circle at 35% 30%,#fff,#bbb);font-weight:700;font-size:12px;cursor:pointer;color:#222}
+/* word / vi / phone */
+.edit{border:1px solid var(--line);background:var(--surface2);border-radius:8px;padding:12px;font-size:20px;font-family:"Noto Sans TC",sans-serif;min-height:60px;white-space:pre-wrap;word-break:break-all;cursor:text}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--ink);vertical-align:text-bottom;animation:blink 1s steps(1) infinite}
+.caret.blk{width:1em;background:var(--control);opacity:.5;animation:none}
+@keyframes blink{50%{opacity:0}}
+.statusbar{display:flex;gap:6px;font-size:11px;margin-top:6px}
+.statusbar span{padding:0 5px;border:1px solid var(--line);color:var(--muted);opacity:.7;border-radius:3px}
+.statusbar span.on{opacity:1;color:var(--ink);background:var(--surface2)}
+.banner{background:var(--bad);color:#fff;border-radius:6px;padding:4px 10px;font-weight:700;margin-top:6px;font-size:14px}
+.term{background:#10161b;color:#c8f7c5;font-family:ui-monospace,Menlo,Consolas,monospace;border-radius:8px;padding:12px;min-height:110px;font-size:15px;white-space:pre-wrap}
+.term .st{color:#8fb;opacity:.9}
+.phone{width:150px;margin:auto;border-radius:24px;background:#2d4150;padding:16px 14px 18px;color:#111}
+.phone .lcd{background:#b9d4a6;border-radius:6px;height:96px;padding:6px;font-family:ui-monospace,Menlo,monospace;font-size:12px;position:relative;display:flex;flex-direction:column;justify-content:space-between}
+.phone .lcd .lab{text-align:center;font-weight:700;font-size:14px;border-top:1px dashed #5d7a4c;padding-top:2px;min-height:22px}
+.phone .navi{display:block;margin:8px auto 0;width:70px;height:18px;border-radius:9px;background:#3d6ea5;border:0;cursor:pointer}
+.phone .pad2{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:10px}
+.phone .pad2 i{height:14px;background:#667;border-radius:5px}
+.mkeys{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.mk{min-width:56px;height:56px;border:1px solid var(--line);border-bottom-width:4px;border-radius:8px;background:var(--surface2);display:grid;place-items:center;font-weight:700;font-size:18px;cursor:pointer;line-height:1.1;text-align:center}
+.mk small{font-size:11px;font-weight:400;color:var(--muted);display:block}
+/* mobile */
+.mini-screen{position:relative;width:100%;max-width:300px;height:90px;background:#26323d;border:5px solid #11171c;border-radius:8px;overflow:hidden;touch-action:none}
+.mini-screen .trk{position:absolute;left:20px;right:20px;top:46px;height:6px;border-radius:3px;background:#5a6772}
+.mini-screen .kn{position:absolute;top:36px;width:26px;height:26px;margin-left:-13px;border-radius:50%;background:#fff;touch-action:none}
+.mini-screen .ttl{position:absolute;left:10px;top:6px;color:#fff;font-size:12px}
+.kb{position:relative;display:grid;gap:5px;justify-content:center;padding:10px;background:#cfd4da;border-radius:10px;max-width:340px;margin:10px auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.kb .r{display:flex;gap:4px;justify-content:center}
+.kb .key{width:27px;height:38px;border-radius:5px;background:#fff;color:#111;display:grid;place-items:center;font-weight:700;font-size:14px;box-shadow:0 1px 0 #888}
+.blob{position:absolute;border-radius:50%;background:rgba(230,150,110,.65);border:2px solid rgba(190,100,60,.8);pointer-events:none;transform:translate(-50%,-50%);z-index:4;display:none}
+.bubble{position:absolute;pointer-events:none;transform:translate(-50%,-100%);background:#fff;color:#111;border-radius:8px;padding:2px 14px;font-size:28px;font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,.4);z-index:5;display:none}
+.mapbox{position:relative;width:100%;max-width:340px;height:220px;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#cfe6d0;touch-action:none;margin:auto}
+.mapbox .inner{position:absolute;left:0;top:0;width:340px;height:220px;transform-origin:0 0}
+.tp{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;pointer-events:none;border:3px solid #fff;z-index:3}
+.arena{position:relative;height:56px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.arena .zone{position:absolute;top:0;bottom:0;width:44px;background:var(--good-soft);border-left:2px solid var(--good);border-right:2px solid var(--good)}
+.arena .ball{position:absolute;top:14px;width:28px;height:28px;margin-left:-14px;border-radius:50%;background:var(--control)}
+.view{position:relative;width:100%;max-width:340px;height:200px;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface2);margin:auto}
+.view .big{position:absolute;left:0;top:0;width:900px;height:640px;background:
+  linear-gradient(90deg,rgba(0,0,0,.08) 1px,transparent 1px) 0 0/60px 60px,
+  linear-gradient(rgba(0,0,0,.08) 1px,transparent 1px) 0 0/60px 60px,linear-gradient(135deg,#bfe3c0,#f2e2b8 45%,#b9d6ee)}
+.view .big b{position:absolute;font-size:22px}
+.view .frame{position:absolute;width:150px;height:100px;border:3px solid var(--bad);background:rgba(255,255,255,.1);pointer-events:none;box-shadow:0 0 0 999px rgba(0,0,0,.28)}
+.mv{width:150px;height:100px;overflow:hidden;border:3px solid #222;border-radius:8px;position:relative;margin:auto}
+.mv .big2{position:absolute;width:900px;height:640px;left:0;top:0;transform-origin:0 0}
+/* dialogs */
+.dlg{width:100%;max-width:280px;border:1px solid #6b7b8a;background:#e9edf1;color:#111;box-shadow:3px 3px 0 rgba(0,0,0,.25);margin:auto}
+.dlg .t{background:#2a4a7d;color:#fff;padding:2px 8px;font-size:13px}
+.dlg .b{padding:14px;display:flex;gap:8px;align-items:center;font-size:15px}
+.dlg .bt{display:flex;gap:8px;justify-content:center;padding:0 10px 12px}
+.dlg .bt span{min-width:64px;text-align:center;border:1px solid #333;background:#f3f3f3;padding:2px 8px;font-size:14px}
+.dlg .bt span.def{outline:2px dotted #111;outline-offset:2px}
+.login{background:#2b5fb5;border-radius:10px;padding:16px;color:#fff;max-width:320px;margin:auto}
+.login input{width:100%;padding:8px;border-radius:5px;border:0;color:#111}
+.tip{background:#fffbe0;color:#111;border:1px solid #bba;border-radius:5px;padding:6px 10px;font-size:13px;margin-top:8px}
+.chart{width:100%;max-width:480px;display:block;margin:auto}
+.pt{cursor:pointer;transition:opacity .3s}
+.fld{display:inline-flex;gap:8px}
+.fld div{width:62px;height:42px;border:2px solid #bbb;border-radius:6px;display:grid;place-items:center;font-size:20px;font-family:ui-monospace,monospace;background:var(--surface)}
+.fld div.f{border-color:var(--control);box-shadow:0 0 0 3px var(--control-soft)}
+.numpad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:320px;margin-top:10px}
+.numpad .btn{padding:6px 0;text-align:center}
+.metaphor-item{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 12px;background:var(--surface);margin:3px;cursor:default}
+.dd{position:relative;height:120px;border:1px dashed var(--line);border-radius:10px;background:var(--surface2);touch-action:none}
+.dd .it{position:absolute;font-size:38px;text-align:center;line-height:1}
+.dd .it small{display:block;font-size:11px;color:var(--muted)}
+.dd .file{cursor:grab;z-index:2;touch-action:none}
+.steps{list-style:none;padding:0;margin:8px 0;display:grid;gap:6px}
+.steps li{border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--surface2);font-size:14px}
+.opt{display:block;width:100%;text-align:left;margin:4px 0}
+.tooltip-on [data-tip]{position:relative}
+.tooltip-on [data-tip]:hover::after,.tooltip-on [data-tip]:focus-visible::after{content:attr(data-tip);position:absolute;left:50%;top:100%;transform:translateX(-50%);background:#fffbe0;color:#111;border:1px solid #886;padding:2px 8px;font-size:12px;border-radius:4px;white-space:nowrap;z-index:10;margin-top:4px}
+.icon-grid{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.icon-grid .btn{font-size:22px;width:52px;height:46px;padding:0}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" id="toc" aria-label="章節導覽">
+  <div class="toc-title">互動元素</div>
+  <a href="#top">總覽</a>
+  <a href="#c1">1 硬／軟控制項</a>
+  <a href="#c2">2 控制－顯示關係</a>
+  <a href="#c3">3 心智模型與隱喻</a>
+  <a href="#c4">4 模式與模式控制</a>
+  <a href="#c5">5 行動情境</a>
+  <a href="#c6">6 互動錯誤</a>
+</nav>
+
+<main id="top">
+<!-- ===================== 總覽 ===================== -->
+<header class="hero">
+  <h1>互動元素<em style="font-size:.4em">Interaction Elements</em></h1>
+  <p class="lede">人利用計算技術完成任務時，就發生了「互動」。本章聚焦在認知層級（約 0.1 秒到 10 秒）的低階互動元素：你按下什麼、螢幕怎麼回應、你又怎麼理解它。每一節都有可以動手操作的小實驗，先玩，再讀。</p>
+  <div class="legend">
+    <span class="chip c"><i></i>琥珀色＝控制項（輸入）</span>
+    <span class="chip d"><i></i>青綠色＝顯示器（輸出）</span>
+  </div>
+
+  <div class="demo" style="margin-top:22px">
+    <h4>整個人機系統是一個閉環：點「送出一個動作」看資訊怎麼繞一圈</h4>
+    <div class="loop" id="loop">
+      <div class="node h"><b>人類</b><span>感覺器官、反應器官（手指、手腕、眼睛）</span></div>
+      <div class="node c"><b>控制項</b><span>Controls／輸入</span></div>
+      <div class="node m"><b>機器</b><span>運算系統的內部狀態</span></div>
+      <div class="node d"><b>顯示器</b><span>Displays／輸出</span></div>
+    </div>
+    <div class="back" id="loopBack">回饋：眼、耳、皮膚接收系統狀態，下一個動作取決於上一個輸出</div>
+    <p style="margin:12px 0 4px"><button class="btn primary" id="loopGo">送出一個動作</button></p>
+    <div class="readout" id="loopText">按下按鈕，例如「把游標移到視窗右上角」會依序經過哪些環節？</div>
+    <p class="note">慣例上 input／output 是相對機器而言：輸入裝置是「機器的輸入」，由人的輸出（四肢、語音、眼動、呼吸甚至腦電訊號）操作。</p>
+  </div>
+
+  <div class="demo">
+    <h4>本章只看這一段：認知層級</h4>
+    <div class="band">
+      <div style="flex:1;background:#5b6b8f">刻意動作 ≈100 ms</div>
+      <div style="flex:2;background:#2b3a67">操作 ≈1 s</div>
+      <div style="flex:4;background:#0c7f82">單元任務 ≈10 s</div>
+    </div>
+    <p class="note" style="margin:0">這個時間範圍很適合做實驗：任務短，雜訊少（暫停、換工作、思考、做決定都還沒混進來），因此能有高「內部效度」。更高層級（分鐘到月）的任務牽涉太多額外行為，較難控制。</p>
+  </div>
+</header>
+
+<!-- ===================== 1 ===================== -->
+<section class="chapter" id="c1">
+  <div class="ch-head">
+    <h2><span class="ch-no">1</span>硬控制項與軟控制項<em>Hard Controls vs. Soft Controls</em></h2>
+    <p>從實體旋鈕到螢幕上的按鈕，介面元件由「製造完就固定」演變成「寫幾行程式就能生出來」。</p>
+  </div>
+
+  <article class="sub" id="c1-1">
+    <h3>1.1 硬控制項<em>Hard Controls</em></h3>
+    <p>實體、單一用途的硬體：滑鼠、鍵盤、按鈕、搖桿、旋鈕、方向盤。它們經過設計、工程與製造，<b>做好之後就固定一輩子</b>，所以和顯示器之間只能有一小組固定的對應關係。連飛機駕駛艙，控制與顯示的數量也都很有限。</p>
+    <div class="demo">
+      <h4>試著操作這些硬控制項</h4>
+      <div class="hard-grid">
+        <button class="hard" data-t="knob" data-msg="音量旋鈕：只能轉，只管音量。想多一個功能，就得再做一顆旋鈕。"><span class="k"></span>音量旋鈕</button>
+        <button class="hard" data-t="sw" data-msg="電源開關：實體只有開／關兩個位置，形狀與行為在出廠時就已決定。"><span class="sw"></span>電源開關</button>
+        <button class="hard" data-t="key" data-msg="按鍵：印在鍵帽上的字就是它的用途，無法在使用中改寫。"><span class="kc">Enter</span>按鍵</button>
+        <button class="hard" data-t="js" data-msg="搖桿：控制關係被實體空間綁死，只能對應到一個固定的顯示。"><span class="js"></span>搖桿</button>
+      </div>
+      <div class="readout" id="hardMsg">點點看任何一個。</div>
+    </div>
+    <div class="example"><b>實例</b>老式收音機：一個旋鈕調音量、一個調頻率、一個切換 AM／FM。功能一多，面板就長滿旋鈕。</div>
+  </article>
+
+  <article class="sub" id="c1-2">
+    <h3>1.2 軟控制項<em>Soft Controls</em></h3>
+    <p>由軟體在圖形顯示器上動態畫出來的元件，例如工具列按鈕、捲動條滑塊（slider）、下拉式組合框（combo box）。因為是畫在顯示器上，大小、形狀、外觀都能隨時改變來傳達資訊，所以<b>軟控制項通常「既是控制項、也是顯示器」</b>。</p>
+    <div class="demo">
+      <h4>實驗 A：工具列既能控制，也在顯示狀態</h4>
+      <div class="toolbar" id="tb">
+        <select id="tbStyle"><option>Body Text</option><option>Heading</option></select>
+        <select id="tbFont"><option>Times</option><option>Arial</option></select>
+        <select id="tbSize"><option>12</option><option>18</option><option>26</option></select>
+        <button class="tgl" data-f="bold"><b>B</b></button>
+        <button class="tgl" data-f="italic"><i>I</i></button>
+        <button class="tgl" data-f="underline"><u>U</u></button>
+      </div>
+      <div class="doc" id="tbDoc">
+        <span class="seg" data-i="0">一般文字</span>
+        <span class="seg" data-i="1">粗體文字</span>
+        <span class="seg" data-i="2">斜體加底線</span>
+      </div>
+      <p class="note">① 點選文字（看工具列怎麼變：<span class="tag-d">顯示器</span>角色）。② 再按工具列的 B／I／U 或下拉選單（<span class="tag-c">控制項</span>角色）。</p>
+    </div>
+    <div class="demo">
+      <h4>實驗 B：捲動條的滑塊同時是控制項與顯示器</h4>
+      <div class="sb-wrap"><div class="sb-view" id="sbView"></div><div class="sb-track" id="sbTrack"><div class="sb-thumb" id="sbThumb"></div></div></div>
+      <p style="margin:10px 0 0"><button class="btn" id="sbMore">文件加長</button> <button class="btn" id="sbLess">文件縮短</button></p>
+      <div class="readout" id="sbRead"></div>
+      <p class="note">拖曳滑塊來改變視圖（控制）。滑塊的長度代表「視圖佔整份文件的比例」、位置代表「目前看到哪裡」（顯示）。試著按「文件加長」，滑塊會變短。</p>
+    </div>
+    <div class="example"><b>實例</b>Word 工具列僅約 30 平方公分，卻有 20 多個軟控制項，而且一次按鍵或點擊就能把整塊區域變成另一種介面。一個控制項可能被單擊、雙擊、Shift＋點擊、拖曳、右鍵或鍵盤操作，而且鄰居近在咫尺，專家也常出錯。</div>
+  </article>
+
+  <article class="sub" id="c1-3">
+    <h3>1.3 空間多工與時間多工<em>Space vs. Time Multiplexing</em></h3>
+    <p><b>空間多工</b>：每個參數有專屬、固定位置的實體控制項。<b>時間多工</b>：控制項比參數少，用同一個裝置（例如螢幕上一小塊區域）在不同階段重新設定，去控制不同參數。這正對應硬控制項與軟控制項的差異。</p>
+    <div class="demo">
+      <div class="row">
+        <div>
+          <h4>空間多工：4 個參數，4 個控制項</h4>
+          <div class="dofs" id="spaceMux" style="grid-template-columns:70px 1fr 36px"></div>
+          <p class="note">占空間，但每個參數隨手可調，一眼看到所有狀態。</p>
+        </div>
+        <div>
+          <h4>時間多工：4 個參數，1 個控制項</h4>
+          <div class="tabs" id="timeTabs"></div>
+          <div class="dofs" style="grid-template-columns:1fr 36px"><input type="range" id="timeSlider" min="0" max="100" aria-label="共用滑桿"><span id="timeVal"></span></div>
+          <div class="readout" id="timeRead"></div>
+          <p class="note">省空間，但必須先「切換」，並確認目前控制的是哪個參數。切換本身就是一種模式（見第 4 章）。</p>
+        </div>
+      </div>
+    </div>
+    <div class="example"><b>實例</b>電視遙控器的「音量＋／－」是空間多工；而螢幕下方的功能鍵在選單裡一鍵多用，則是時間多工。</div>
+  </article>
+</section>
+
+<!-- ===================== 2 ===================== -->
+<section class="chapter" id="c2">
+  <div class="ch-head">
+    <h2><span class="ch-no">2</span>控制－顯示關係<em>Control-Display Relationships</em></h2>
+    <p>你對控制項做的物理動作，與顯示器上的反應之間，有空間、動態與物理三種「映射」（mapping）。理想的互動是自然、順暢、直覺而有效率的。</p>
+  </div>
+
+  <article class="sub" id="c2-1">
+    <h3>2.1 空間映射與一致性<em>Spatial Mapping &amp; Congruence</em></h3>
+    <p>滑鼠往右、游標往右，是<b>完全一致（congruent）</b>的對應。但滑鼠往「前」（桌面 z 軸）、游標卻往「上」（螢幕 y 軸），在 y–z 平面看就是 90° 的<b>轉化映射（transformed spatial mapping）</b>。研究發現：轉換角度在 90°～135° 時瞄準誤差較高，0° 或 180° 較低；而所有轉換都能適應，最快約 50 次嘗試。</p>
+    <table class="mini"><tr><th>軸向</th><th>控制（滑鼠）</th><th>顯示（游標）</th></tr>
+      <tr><td>x</td><td>左右 +x</td><td>左右 +x（一致）</td></tr>
+      <tr><td>y／z</td><td>前後 +z</td><td>上下 +y（轉換 90°）</td></tr></table>
+    <div class="demo">
+      <h4>實驗：換一種映射，看你需要多久適應</h4>
+      <div class="tabs" id="spTabs">
+        <button class="btn on" data-a="0">一般滑鼠映射</button>
+        <button class="btn" data-a="90">再旋轉 90°</button>
+        <button class="btn" data-a="180">再旋轉 180°</button>
+      </div>
+      <div class="row">
+        <div><div class="pad" id="spPad"><span class="lbl">觸控墊（桌面）</span><i class="pdot" id="spDot"></i></div><p class="note">在這裡移動指標，輕點（或按一下）來選取。</p></div>
+        <div><div class="scr" id="spScr"><span class="lbl">螢幕</span><div class="tgt" id="spTgt" style="width:30px;height:30px"></div><div class="cursor" id="spCur"></div></div></div>
+      </div>
+      <p class="note">任務：把游標移到紅色目標上並選取。</p>
+      <table class="mini" id="spStats"></table>
+    </div>
+    <div class="demo">
+      <h4>三層映射：捲動條</h4>
+      <p style="margin:0">滑鼠往<b>前</b>（硬控制項）→ 滑塊往<b>上</b>（軟控制項）→ 地圖視圖往<b>下</b>（顯示）。控制與顯示在 z 軸上出現 +／－ 反轉，但使用者已很習慣。反過來也行，只是需要重新學習。</p>
+    </div>
+    <div class="example"><b>實例</b>Google 街景：拖曳圖片時，滑鼠左右移動讓場景繞 y 軸旋轉、前後移動讓場景繞 x 軸旋轉。映射看起來複雜，卻很快學會；而「縮放」的 z 軸卻被讓給上下平移，只能靠 + 、－ 軟按鈕。</div>
+  </article>
+
+  <article class="sub" id="c2-2">
+    <h3>2.2 自由度與整合性<em>Degrees of Freedom &amp; Integrality</em></h3>
+    <p>要完整描述一個物體在 3D 空間的位置，需要 6 個獨立參數：3 個位置（x、y、z）＋ 3 個旋轉角（θx、θy、θz）。滑鼠只能感測 2 個，所以旋轉需要靠「模式」或特殊裝置。</p>
+    <div class="demo">
+      <h4>實驗 A：親手操作 6 個自由度</h4>
+      <div class="row">
+        <div class="stage"><div class="cube" id="cube"><div class="face f1">前</div><div class="face f2">後</div><div class="face f3">右</div><div class="face f4">左</div><div class="face f5">上</div><div class="face f6">下</div></div></div>
+        <div>
+          <div class="dofs" id="dofCtl"></div>
+          <label class="inline" style="margin-top:8px"><input type="checkbox" id="dofMouse"> 模擬滑鼠：只剩 x、y 兩個自由度</label>
+        </div>
+      </div>
+      <p class="note">完全一致的 6 DOF 輸入（例如 6 DOF 手套）才能讓虛擬手套與真實手一一對應。</p>
+    </div>
+    <p>自由度也可以設計成<b>整合型（integral）</b>：一起動，像滑鼠同時控制 x、y；或<b>分離型（separable）</b>：各自獨立，像 Etch-A-Sketch 的兩個旋鈕分別控制 x 軸與 y 軸。</p>
+    <div class="demo">
+      <h4>實驗 B：畫一條水平線</h4>
+      <div class="tabs" id="intTabs"><button class="btn on" data-m="mouse">整合型（滑鼠）</button><button class="btn" data-m="eas">分離型（Etch-A-Sketch）</button></div>
+      <canvas class="draw" id="intCv" width="320" height="180"></canvas>
+      <div id="easCtl" style="display:none;max-width:320px">
+        <label class="note">X 旋鈕</label><input type="range" id="easX" min="0" max="320" value="10">
+        <label class="note">Y 旋鈕</label><input type="range" id="easY" min="0" max="180" value="90">
+      </div>
+      <p style="margin:8px 0 0"><button class="btn" id="intClear">清除</button></p>
+      <div class="readout" id="intRead">整合型：在畫布上按住並拖曳，試著畫出水平線。</div>
+    </div>
+    <div class="example"><b>實例</b>Etch-A-Sketch 畫水平線很輕鬆，畫斜線卻很難；滑鼠剛好相反。Microsoft IntelliMouse 加了滾輪，等於多一個獨立的自由度。</div>
+  </article>
+
+  <article class="sub" id="c2-3">
+    <h3>2.3 控制顯示增益與轉移函數<em>CD Gain &amp; Transfer Function</em></h3>
+    <p><b>CD gain</b>＝顯示物件（游標）的移動量 ÷ 控制器的移動量。滑鼠動 3 cm、游標動 6 cm，增益就是 2。作業系統的「增強指標精確度」是<b>非線性轉移函數</b>：滑鼠快移時增益變大（快速到達附近），慢移時變小（最後精準瞄準）。</p>
+    <div class="demo">
+      <h4>實驗：調整增益，並比較有無「增強指標精確度」</h4>
+      <div class="row">
+        <div><div class="pad" id="cdPad"><span class="lbl">滑鼠墊</span></div></div>
+        <div><div class="scr" id="cdScr"><span class="lbl">螢幕</span><div class="tgt" id="cdTgt" style="width:14px;height:14px;left:80%;top:50%"></div><div class="cursor" id="cdCur"></div></div></div>
+      </div>
+      <p style="margin:8px 0"><label>增益 <b id="cdG">1.5</b>：<input type="range" id="cdGain" min="0.3" max="4" step="0.1" value="1.5" style="width:200px;vertical-align:middle"></label>
+      <label class="inline"><input type="checkbox" id="cdEnh"> 增強指標精確度</label>
+      <button class="btn" id="cdReset">游標歸位</button></p>
+      <div class="readout" id="cdRead">在滑鼠墊上移動：快速甩過去，再慢慢對準小目標。</div>
+    </div>
+    <div class="demo">
+      <h4>為什麼最佳增益很難定？（示意曲線，不是真實量測）</h4>
+      <svg class="chart" id="cdChart" viewBox="0 0 420 240" role="img" aria-label="增益與定位時間的取捨"></svg>
+      <p class="note">增益高：大幅度移動（粗定位）很快，但最後對準（細定位）變慢；增益低則相反。最佳點要同時考慮速度、錯誤率與顯示器大小。多數研究發現，單靠調整 CD gain 並沒有顯著的效能提升。</p>
+    </div>
+    <div class="example"><b>實例</b>大螢幕與小螢幕、輔助科技使用者、遠端指向、3D 互動都各有最佳增益，所以這個參數至今仍是研究題材。</div>
+  </article>
+</section>
+
+<!-- ===================== 3 ===================== -->
+<section class="chapter" id="c3">
+  <div class="ch-head">
+    <h2><span class="ch-no">3</span>心智模型與隱喻<em>Mental Models &amp; Metaphors</em></h2>
+    <p>人靠過去的實體經驗與類比，替抽象的電腦系統建立「它是怎麼運作的」的內在模型。</p>
+  </div>
+
+  <article class="sub" id="c3-1">
+    <h3>3.1 桌面隱喻與圖示<em>Desktop Metaphor &amp; Icons</em></h3>
+    <p>1970 末到 1980 初，圖形介面很陌生。設計者借用辦公室桌面：文件、資料夾、檔案櫃、垃圾桶，讓使用者以熟悉的概念來行動，降低學習門檻。圖示（icon）則是用圖像喚起真實世界經驗的線索。</p>
+    <div class="demo">
+      <h4>實驗 A：把檔案拖到資料夾或垃圾桶</h4>
+      <div class="dd" id="dd">
+        <div class="it file" id="ddFile" style="left:20px;top:30px">📄<small>報告.docx</small></div>
+        <div class="it" id="ddFolder" style="left:45%;top:30px">📁<small>資料夾</small></div>
+        <div class="it" id="ddTrash" style="right:20px;top:30px">🗑️<small>垃圾桶</small></div>
+      </div>
+      <div class="readout" id="ddMsg">拖曳檔案圖示。你不需要被教，因為你早就知道「放進資料夾」和「丟垃圾桶」。</div>
+    </div>
+    <div class="demo">
+      <h4>實驗 B：猜猜工具列圖示的功能</h4>
+      <label class="inline"><input type="checkbox" id="ttOn" checked> 開啟 tooltip（把滑鼠停在圖示上）</label>
+      <div class="icon-grid tooltip-on" id="icons"></div>
+      <div id="iconQ"></div>
+      <p class="note">1991 年 Apple 推出「balloons」，也就是今日的 tooltip（螢幕提示）：滑鼠停留，就浮出簡短說明。</p>
+    </div>
+    <div class="demo">
+      <h4>要避免的是「實作模型」</h4>
+      <div class="tabs"><button class="btn on" data-m="impl">傳真軟體：實作模型</button><button class="btn" data-m="ment">傳真軟體：使用者心智模型</button></div>
+      <ul class="steps" id="faxSteps"></ul>
+    </div>
+    <div class="example"><b>實例</b>Paint Shop Pro 的 21 個工具圖示：放大鏡、畫筆很清楚，有些（例如「Picture Tube」）連資深使用者都不懂，所以需要 tooltip。羅盤（北＝前方）與時鐘（「兩點鐘方向有障礙物」）也是常見的方向隱喻，例如盲人導航或用觸覺腰帶指路。</div>
+  </article>
+
+  <article class="sub" id="c3-2">
+    <h3>3.2 實體類比與群體刻板印象<em>Physical Analogy &amp; Population Stereotypes</em></h3>
+    <p>如果控制與顯示之間缺少直接的物理對應，一個文化或地理群體會因長期習慣而形成共同期待，稱為<b>群體刻板印象（population stereotype）</b>。它看起來「很自然」，但本質上仍是<b>學來的</b>。</p>
+    <div class="demo">
+      <h4>實驗 A：開關朝上，燈是亮還是滅？</h4>
+      <div class="row">
+        <div><div class="plate up" id="swPlate" role="button" tabindex="0" aria-label="開關"><i></i></div>
+        <p class="note" style="text-align:center">點開關扳動它</p></div>
+        <div><div class="bulb" id="bulb">💡</div></div>
+        <div>
+          <label class="inline"><input type="radio" name="reg" value="us" checked> 我在美國／加拿大</label><br>
+          <label class="inline"><input type="radio" name="reg" value="uk"> 我在英國</label>
+          <div class="readout" id="swRead"></div>
+        </div>
+      </div>
+    </div>
+    <div class="demo">
+      <h4>實驗 B：旋鈕與滑桿，哪個比較「自然」？</h4>
+      <div class="row">
+        <div><div class="knob" id="knob" style="transform:rotate(0deg)"></div><p class="note" style="text-align:center">旋鈕：拖曳旋轉，順時針＝增加</p></div>
+        <div><div class="bar"><i id="barK"></i></div></div>
+        <div><div class="vs" id="vsl"><i id="vslH"></i></div><p class="note" style="text-align:center">滑桿：向上拖</p></div>
+        <div><div class="bar"><i id="barS"></i></div></div>
+      </div>
+      <p class="note">旋轉與直線上升之間存在空間轉換，需要學習（甚至有 Warrick 原則主張指示器應與離它最近的旋鈕點同向，但那只是應用人因工程，認知根據薄弱）。滑桿向上＝顯示向上，才是真正的空間一致。</p>
+    </div>
+    <div class="demo">
+      <h4>實驗 C：電梯按鈕，位置相容性</h4>
+      <div class="row">
+        <div><p id="elTask" style="margin:0 0 8px"></p>
+          <div class="elev" id="elPanel"></div></div>
+        <div><table class="mini" id="elStats"></table>
+          <p class="note">版本 (a)：UP 在上、DOWN 在下（相容）。版本 (b)：位置顛倒（不相容）。人會學會，但通常更慢、更容易出錯。</p></div>
+      </div>
+    </div>
+    <div class="example"><b>實例</b>「檔案存檔」有什麼物理類比？幾乎沒有。HCI 裡真正有物理對應的任務是少數（滑鼠右、游標右），所以使用者需要「很多」幫助，隱喻也就特別重要。</div>
+  </article>
+
+  <article class="sub" id="c3-3">
+    <h3>3.3 評估之鴻溝<em>Gulf of Evaluation</em></h3>
+    <p>系統呈現的狀態，與使用者內心意圖、期望之間出現落差，就是<b>評估之鴻溝</b>。回饋不明確時，使用者無法解讀系統現況，因而挫折、出錯。</p>
+    <div class="demo">
+      <h4>實驗：請在「人機」和「互動」之間，插入「電腦」兩個字</h4>
+      <div class="edit" id="wd" tabindex="0" aria-label="文字編輯區"></div>
+      <div class="statusbar" id="wdBar"><span>REC</span><span>TRK</span><span>EXT</span><span id="wdOvr">OVR</span></div>
+      <div class="banner" id="wdBan" style="display:none">⚠ 覆寫模式（Overtype）</div>
+      <p style="margin:8px 0"><button class="btn" id="wdIns">按 Insert 鍵</button> <button class="btn" id="wdTyp">輸入「電腦」</button> <button class="btn" id="wdRst">重來</button>
+      <label class="inline" style="margin-left:10px"><input type="checkbox" id="wdBig"> 放大模式提示</label></p>
+      <div class="readout" id="wdRead">點選編輯區後直接打字（或按上面的按鈕）。有人先前已悄悄切換過模式。</div>
+    </div>
+    <div class="example"><b>實例</b>Word 的 Insert／Overtype：回饋只是右下角極小的「OVR」。不認識這三個字母的人，根本不會聯想到「覆寫」。</div>
+  </article>
+</section>
+
+<!-- ===================== 4 ===================== -->
+<section class="chapter" id="c4">
+  <div class="ch-head">
+    <h2><span class="ch-no">4</span>模式與模式控制<em>Modes &amp; Mode Control</em></h2>
+    <p>當實體控制項比任務少時，同一個輸入在不同「模式」會有不同結果。設計上的兩大問題：如何切換模式，以及如何讓模式被看見（回饋）。</p>
+  </div>
+
+  <article class="sub" id="c4-1">
+    <h3>4.1 模式<em>Modes</em></h3>
+    <p>模式是系統的「功能運作狀態或條件」。標準鍵盤約 100 個鍵，靠 Shift、Ctrl、Alt 能產生 800 多種變化。歐洲語言鍵盤有些鍵甚至有三種模式。一般物品也有模式：電動釘書機 LED 亮＝要補釘、汽車有 P、R、N、D 檔。</p>
+    <div class="demo">
+      <h4>實驗：按住（切換）修飾鍵，看同一個鍵變出什麼</h4>
+      <div class="tabs" id="kbMods">
+        <button class="btn" data-m="shift">Shift</button>
+        <button class="btn" data-m="caps">Caps Lock</button>
+        <button class="btn" data-m="alt">AltGr（德文鍵盤）</button>
+      </div>
+      <div class="mkeys" id="kbKeys"></div>
+      <div class="readout" id="kbOut">（點鍵盤上的鍵）</div>
+      <p style="margin:6px 0 0"><button class="btn" id="kbClr">清空</button></p>
+    </div>
+    <div class="example"><b>實例</b>Word 說明列出 F9 鍵單按與搭配 Shift／Ctrl／Alt 共有 6 種詮釋。功能鍵本身就充滿模式。</div>
+  </article>
+
+  <article class="sub" id="c4-2">
+    <h3>4.2 模式錯誤與可見性<em>Mode Errors &amp; Mode Visibility</em></h3>
+    <p>使用者忘記或誤判目前模式，就會發生<b>模式錯誤</b>。主因是缺乏明顯且持續的回饋（mode visibility）。Shneiderman：「提供有用的回饋」。Norman：「讓事物可見」。</p>
+    <div class="demo">
+      <h4>實驗：vi 編輯器，一打開就輸入 hello 會怎樣？</h4>
+      <div class="term" id="viTerm" tabindex="0" aria-label="vi 模擬器"></div>
+      <p style="margin:8px 0"><button class="btn" id="viHello">輸入 hello</button> <button class="btn" id="viI">按 i（進入插入模式）</button> <button class="btn" id="viEsc">按 Esc（回指令模式）</button> <button class="btn" id="viRst">重來</button>
+      <label class="inline" style="margin-left:8px"><input type="checkbox" id="viFb"> 顯示模式回饋</label></p>
+      <div class="readout" id="viRead">也可以點上方黑色區域後用實體鍵盤打字。vi 一開始是「指令模式」，目前沒有任何回饋。</div>
+    </div>
+    <div class="example"><b>實例</b>PowerPoint 的 5 種檢視模式共有 5×4＝20 種轉換，其中 16 種靠常駐按鈕。但在「放映」模式按鈕會消失，只能按 Esc 離開；許多人曾被困在某個模式中，只好重開程式。</div>
+    <div class="demo">
+      <h4>PowerPoint 檢視模式</h4>
+      <div class="tabs" id="ppt"></div>
+      <div class="readout" id="pptRead"></div>
+    </div>
+  </article>
+
+  <article class="sub" id="c4-3">
+    <h3>4.3 軟硬控制鍵與切換<em>Soft-Hard Keys &amp; Mode Switching</em></h3>
+    <p>實體鍵盤上的是<b>硬鍵</b>（模式少）。結合「實體按鈕＋由軟體在螢幕上定義其標籤」的稱為<b>軟硬鍵</b>（soft-hard keys，模式很多）。螢幕上的小區域則是完整的<b>軟鍵</b>，模式數量無限。</p>
+    <div class="demo">
+      <h4>實驗：Nokia 3210 的 Navi 鍵，同一顆鍵、不同動作</h4>
+      <div class="row">
+        <div>
+          <div class="phone"><div class="lcd"><div id="phSt">主畫面</div><div class="lab" id="phLab">Menu</div></div>
+          <button class="navi" id="phNavi" aria-label="Navi 鍵"></button>
+          <div class="pad2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+        </div>
+        <div>
+          <div class="tabs" id="phStates"></div>
+          <label class="inline"><input type="checkbox" id="phFb" checked> 在鍵的上方顯示目前功能</label>
+          <div class="readout" id="phRead">按下 Navi 鍵。</div>
+          <p class="note">這個鍵上只有一條藍線，意義完全由螢幕上方那個字決定，至少有 14 種詮釋。靠近控制項的回饋，讓使用者知道目前模式。</p>
+        </div>
+      </div>
+    </div>
+    <div class="example"><b>實例</b>LCD 螢幕側邊的四顆實體按鈕：按任何一顆，畫面左側才疊出各按鈕目前的用途。平常按鈕本身沒有標示。設計原則：切換路徑要明確，也要容易退出。</div>
+  </article>
+</section>
+
+<!-- ===================== 5 ===================== -->
+<section class="chapter" id="c5">
+  <div class="ch-head">
+    <h2><span class="ch-no">5</span>行動情境與直接輸入<em>Mobile Context &amp; Direct Input</em></h2>
+    <p>2007 年 iPhone 之後，按鍵與觸控筆讓位給手指：滑動、輕彈、捏合、點擊。桌面上的許多互動元素在行動情境中根本不存在。</p>
+  </div>
+
+  <article class="sub" id="c5-1">
+    <h3>5.1 直接輸入與 WYSIWYG<em>Direct Input &amp; WYSIWYG</em></h3>
+    <p>滑鼠、觸控板是<b>間接輸入</b>：系統反應和輸入裝置空間分離，所以需要游標，也才有 CD gain 與控制－顯示映射。手指在觸控螢幕上是<b>直接輸入</b>：反應就在觸點，即「所見即所得」（WYSIWYG），不需要游標，也沒有 CD gain。</p>
+    <div class="demo">
+      <div class="row">
+        <div>
+          <h4>間接輸入：先移動游標，再抓住滑塊</h4>
+          <div class="mini-screen" id="indScr"><span class="ttl">亮度</span><div class="trk"></div><div class="kn" id="indKn" style="left:30%"></div><div class="cursor" id="indCur"></div></div>
+          <div class="pad" id="indPad" style="margin-top:8px;max-width:300px;aspect-ratio:4/1"><span class="lbl">觸控板：移動游標，在滑塊上按一下並拖曳</span></div>
+          <div class="readout" id="indRead"></div>
+        </div>
+        <div>
+          <h4>直接輸入：手指直接拖滑塊</h4>
+          <div class="mini-screen" id="dirScr"><span class="ttl">亮度</span><div class="trk"></div><div class="kn" id="dirKn" style="left:30%"></div></div>
+          <div class="readout" id="dirRead">不需要游標、不需要映射。</div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="sub" id="c5-2">
+    <h3>5.2 胖手指問題與遮擋<em>Fat Finger Problem &amp; Occlusion</em></h3>
+    <p>直接輸入的副作用：像素級的精準選取很困難。原因有二：(1) 手指<b>遮住</b>接觸位置；(2) 接觸的是一塊<b>面積</b>而不是一個點。解法如 Potter 等人（1988）提出的<b>偏移游標（offset cursor）</b>：手指碰到螢幕時，在指尖上方出現十字游標；移到目標後，手指<b>離開</b>才選取（<b>離手選擇 take-off selection</b>）。</p>
+    <div class="demo">
+      <h4>實驗：用手指輸入目標字母</h4>
+      <div class="tabs" id="ffMode"><button class="btn on" data-m="direct">直接（碰到就選）</button><button class="btn" data-m="offset">偏移顯示＋離手選擇</button></div>
+      <label class="note">手指大小：<input type="range" id="ffSize" min="22" max="64" value="46" style="width:160px;vertical-align:middle"></label>
+      <p style="margin:6px 0 0">請輸入：<b id="ffTarget" style="font-size:24px"></b></p>
+      <div class="kb" id="kb"><div class="blob" id="ffBlob"></div><div class="bubble" id="ffBub"></div></div>
+      <div class="readout" id="ffRead">在鍵盤上按下並移動（手指會遮住按鍵）。</div>
+      <table class="mini" id="ffStats"></table>
+      <p class="note">直接模式中，你看不到真正的接觸位置，所以這裡用「手指越大、落點偏差越大」來模擬。偏移模式讓你在放開前確認選到的是哪個鍵。iPhone 鍵盤的放大氣泡就是這個做法。</p>
+    </div>
+  </article>
+
+  <article class="sub" id="c5-3">
+    <h3>5.3 多點觸控與感測器整合<em>Multi-touch &amp; Sensor Integration</em></h3>
+    <p>觸控螢幕可以同時感測多個接觸點（甚至十指），可偵測壓力，支援捏合縮放、多指操作。此外，加速度計可偵測裝置的傾斜角，使「傾斜」成為新的輸入原語（tilt gain）；也能製作<b>空間感知顯示（spatially aware display）</b>：移動裝置，視圖就跟著移動。</p>
+    <div class="demo">
+      <h4>實驗 A：多點觸控地圖（拖曳平移、兩指捏合、滾輪縮放）</h4>
+      <div class="mapbox" id="mapBox"><div class="inner" id="mapIn"></div></div>
+      <p style="margin:8px 0"><label class="note">縮放：<input type="range" id="mapZ" min="0.6" max="4" step="0.05" value="1" style="width:180px;vertical-align:middle"></label></p>
+      <div class="readout" id="mapRead">接觸點：0</div>
+    </div>
+    <div class="demo">
+      <h4>實驗 B：傾斜控制（tilt gain）</h4>
+      <p style="margin:0 0 6px">傾斜角度決定球的速度（像素／秒＝增益×角度）。把球停在綠色區域內約 0.6 秒。</p>
+      <div class="arena" id="arena"><div class="zone" id="zone"></div><div class="ball" id="ball"></div></div>
+      <label class="note">傾斜角：<input type="range" id="tiltS" min="-40" max="40" step="1" value="0" style="width:60%;vertical-align:middle"> <b id="tiltV">0°</b></label>
+      <div class="tabs" id="gainTabs" style="margin-top:6px"></div>
+      <p style="margin:6px 0"><button class="btn" id="tiltSensor">使用手機感測器</button></p>
+      <div class="readout" id="tiltRead">選擇增益後開始。</div>
+      <p class="note">MacKenzie 與 Teather（2012）比較 25、50、100、200 四種增益：落在 50～100 的表現最好（完成時間較短、吞吐量較高）。</p>
+    </div>
+    <div class="demo">
+      <h4>實驗 C：空間感知顯示（把滑鼠移動當成移動手機）</h4>
+      <div class="row">
+        <div><div class="view" id="saBig"><div class="big"><b style="left:60px;top:50px">🏯 台南</b><b style="left:340px;top:120px">🌊 海</b><b style="left:620px;top:80px">⛰ 山</b><b style="left:140px;top:420px">🏙 高雄</b><b style="left:560px;top:460px">🌴 墾丁</b></div><div class="frame" id="saFrame"></div></div></div>
+        <div><div class="mv"><div class="big2" id="saMini"></div></div><p class="note" style="text-align:center">裝置螢幕看到的內容</p></div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ===================== 6 ===================== -->
+<section class="chapter" id="c6">
+  <div class="ch-head">
+    <h2><span class="ch-no">6</span>互動錯誤與設計誘發錯誤<em>Interaction Errors &amp; Design-Induced Errors</em></h2>
+    <p>花費時間只是「快一點慢一點」，錯誤卻只會妨礙。人類表現像食物，物理特性只是盤子與碗，真正想要的是「好的食物」。</p>
+  </div>
+
+  <article class="sub" id="c6-1">
+    <h3>6.1 設計誘發錯誤<em>Design-Induced Errors</em></h3>
+    <p>當設計沒考慮到人的特性與行為習慣時發生的錯誤，稱為<b>設計誘發錯誤</b>，而不是單純的「使用者錯誤」。</p>
+    <div class="demo">
+      <h4>實驗 A：你剛打完報告，彈出對話框，你習慣直接按 Enter</h4>
+      <div class="tabs" id="dlgTabs"><button class="btn on" data-m="save">版本 (a)：Save changes?</button><button class="btn" data-m="disc">版本 (b)：Discard changes?</button></div>
+      <div class="dlg" id="dlg"></div>
+      <p style="margin:10px 0 0"><button class="btn primary" id="dlgEnter">按 Enter</button></p>
+      <div class="readout" id="dlgRead"></div>
+    </div>
+    <div class="demo">
+      <h4>實驗 B：登入時 Caps Lock 開著</h4>
+      <div class="login">
+        <div style="margin-bottom:6px">請輸入密碼（正確答案：<b>hci2013</b>）</div>
+        <input type="password" id="pwd" autocomplete="off" aria-label="密碼">
+        <div class="tip" id="capTip" style="display:none"><b>Caps Lock 已開啟</b><br>這可能使你輸入錯誤的密碼。請先按 Caps Lock 關閉它。</div>
+        <p style="margin:8px 0 0"><button class="btn" id="pwdGo" style="color:#111">登入</button></p>
+      </div>
+      <p style="margin:10px 0 0"><label class="inline"><input type="checkbox" id="capSim"> 模擬 Caps Lock 已開啟</label>
+      <label class="inline"><input type="checkbox" id="capHint"> 系統提供 Caps Lock 警示</label></p>
+      <div class="readout" id="pwdRead">勾選「模擬 Caps Lock」後再輸入，注意畫面上有沒有任何線索。</div>
+    </div>
+  </article>
+
+  <article class="sub" id="c6-2">
+    <h3>6.2 錯誤成本與頻率的權衡<em>Cost vs. Frequency of Errors</em></h3>
+    <p>高成本的錯誤（資料遺失）很少發生，也會優先被修；低成本錯誤（焦點不確定、過度捲動）發生頻率高，卻常被忽視而長期留在系統裡。有趣的錯誤往往是「小」的那些。</p>
+    <div class="demo">
+      <h4>拖動「產業成熟度」，看誰先被修好（示意圖）</h4>
+      <svg class="chart" id="ceChart" viewBox="0 0 440 300" role="img" aria-label="錯誤成本與頻率"></svg>
+      <label class="note">時間推移：<input type="range" id="ceT" min="0" max="100" value="0" style="width:60%;vertical-align:middle"></label>
+      <div class="readout" id="ceRead">點圖上的點看說明。</div>
+    </div>
+    <div class="example"><b>實例</b>「Discard changes?」早成歷史；Caps Lock 警示愈來愈普及；拖曳選取時的暴衝捲動在新軟體中已受控；但「輸入框到底有沒有焦點」仍然是一團亂。</div>
+  </article>
+
+  <article class="sub" id="c6-3">
+    <h3>6.3 焦點推進與微策略<em>Focus Advancement &amp; Microstrategies</em></h3>
+    <p>鍵盤事件會送給取得<b>焦點</b>的元件。各種軟體的焦點取得、焦點推進（focus advancement）規則不一致，迫使使用者在鍵盤與螢幕之間反覆轉移視線，每次來回就是 2 次眼跳（saccade，約 70～700 ms）。這些細微的操作就是<b>微策略（microstrategies）</b>。</p>
+    <div class="demo">
+      <h4>實驗：輸入 9 位數帳號 980-123-456（輸入時眼睛看鍵盤）</h4>
+      <p style="margin:0 0 8px">系統會隨機決定「填滿三碼後自動跳到下一欄」或「不會」，而且不告訴你。焦點框預設看不見（因為你在看鍵盤），要看就得花一次視線轉移。</p>
+      <div class="fld" id="focFld"><div></div><div></div><div></div></div>
+      <div class="numpad" id="focPad"></div>
+      <p style="margin:8px 0"><button class="btn primary" id="focLook">看螢幕確認焦點（視線轉移）</button> <button class="btn" id="focTab">按 Tab 到下一欄</button> <button class="btn" id="focRst">重新開始</button></p>
+      <div class="readout" id="focRead"></div>
+    </div>
+    <div class="keypoint"><b>重點</b>大動作是由一堆小動作組成。使用者的整個體驗就是微策略的集合，讓它們為人服務，而不是為電腦服務。</div>
+    <div class="example"><b>實例</b>登入視窗有時一彈出就能直接輸入，有時卻沒焦點，要先用滑鼠點一下或按 Tab。使用者永遠不知道，只好保持警戒。</div>
+  </article>
+</section>
+
+<footer>
+  內容整理自《Human-Computer Interaction: An Empirical Research Perspective》第 3 章 Interaction Elements。互動示範皆為教學用模擬，曲線與數字僅供說明，不代表原研究資料。
+</footer>
+</main>
+</div>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rand=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function setTabs(box,cb){ $$('button',box).forEach(b=>b.addEventListener('click',()=>{$$('button',box).forEach(x=>x.classList.remove('on'));b.classList.add('on');cb(b);})); }
+
+/* ---------- nav scrollspy ---------- */
+(function(){
+  const links=$$('#toc a'); const ids=links.map(a=>a.getAttribute('href').slice(1));
+  const obs=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id)); const on=$('#toc a.on'); if(on&&window.innerWidth<1000) on.scrollIntoView({inline:'center',block:'nearest'}); } }); },{rootMargin:'-20% 0px -70% 0px'});
+  ids.forEach(id=>{const el=document.getElementById(id); if(el) obs.observe(el);});
+})();
+
+/* ---------- hero loop ---------- */
+(function(){
+  const nodes=$$('#loop .node'), back=$('#loopBack'), txt=$('#loopText'), btn=$('#loopGo');
+  const steps=[
+    '你想把游標移到視窗右上角。手指與手腕（人的反應器官）開始動作。',
+    '手推動滑鼠。滑鼠是控制項，是「機器的輸入」。',
+    '電腦計算新的游標位置。延遲（latency）要夠小，你才不會察覺。',
+    '螢幕上的游標移動了。這是顯示器，是「機器的輸出」。',
+    '眼睛看到游標位置，你決定繼續移動、還是按下去。下一個輸入取決於上一個輸出，閉環完成。'
+  ];
+  let busy=false;
+  function show(i){ nodes.forEach((n,k)=>n.classList.toggle('lit',k===i)); back.classList.toggle('lit',i===4); txt.textContent=steps[i]; }
+  btn.addEventListener('click',()=>{ if(busy) return; busy=true; let i=0; show(0); const t=setInterval(()=>{ i++; if(i>4){ clearInterval(t); busy=false; setTimeout(()=>{nodes.forEach(n=>n.classList.remove('lit'));back.classList.remove('lit');},1400); return;} show(i); },1500); });
+  nodes[0].classList.add('h'); nodes[1].classList.add('c'); nodes[2].classList.add('m'); nodes[3].classList.add('d');
+})();
+
+/* ---------- 1.1 hard controls ---------- */
+(function(){
+  let rot=0;
+  $$('.hard').forEach(b=>b.addEventListener('click',()=>{
+    $('#hardMsg').textContent=b.dataset.msg;
+    const t=b.dataset.t;
+    if(t==='knob'){ rot+=50; $('.k',b).style.transform='rotate('+rot+'deg)'; }
+    if(t==='sw'){ $('.sw',b).classList.toggle('on'); }
+    if(t==='js'){ $('.js',b).style.setProperty('--tilt',pick([-30,-15,15,30])+'deg'); }
+  }));
+})();
+
+/* ---------- 1.2 toolbar ---------- */
+(function(){
+  const segs=$$('#tbDoc .seg');
+  const st=[{bold:false,italic:false,underline:false,font:'Times',size:'12',style:'Body Text'},
+            {bold:true,italic:false,underline:false,font:'Times',size:'12',style:'Body Text'},
+            {bold:false,italic:true,underline:true,font:'Arial',size:'18',style:'Body Text'}];
+  let sel=0;
+  function render(){
+    segs.forEach((s,i)=>{ const a=st[i]; s.style.fontWeight=a.bold?'700':'400'; s.style.fontStyle=a.italic?'italic':'normal'; s.style.textDecoration=a.underline?'underline':'none'; s.style.fontFamily=a.font; s.style.fontSize=a.size+'px'; s.classList.toggle('sel',i===sel); });
+    const a=st[sel]; $('#tbStyle').value=a.style; $('#tbFont').value=a.font; $('#tbSize').value=a.size;
+    $$('#tb .tgl').forEach(b=>b.classList.toggle('on',a[b.dataset.f]));
+  }
+  segs.forEach((s,i)=>s.addEventListener('click',()=>{sel=i;render();}));
+  $$('#tb .tgl').forEach(b=>b.addEventListener('click',()=>{st[sel][b.dataset.f]=!st[sel][b.dataset.f];render();}));
+  $('#tbStyle').addEventListener('change',e=>{st[sel].style=e.target.value;render();});
+  $('#tbFont').addEventListener('change',e=>{st[sel].font=e.target.value;render();});
+  $('#tbSize').addEventListener('change',e=>{st[sel].size=e.target.value;render();});
+  render();
+})();
+
+/* ---------- 1.2 scrollbar ---------- */
+(function(){
+  const view=$('#sbView'), track=$('#sbTrack'), thumb=$('#sbThumb'), read=$('#sbRead');
+  let n=30;
+  function fill(){ view.innerHTML=''; for(let i=1;i<=n;i++){ const d=document.createElement('div'); d.textContent='第 '+String(i).padStart(3,'0')+' 行：Hello, HCI'; view.appendChild(d);} update(); }
+  function update(){
+    const vh=view.clientHeight, sh=view.scrollHeight, th=track.clientHeight;
+    const h=Math.max(22,th*vh/sh); thumb.style.height=h+'px';
+    const maxS=sh-vh, maxT=th-h; thumb.style.top=(maxS>0?view.scrollTop/maxS*maxT:0)+'px';
+    read.textContent='視圖佔全文 '+Math.round(vh/sh*100)+'%；位置在 '+(maxS>0?Math.round(view.scrollTop/maxS*100):0)+'%';
+  }
+  view.addEventListener('scroll',update);
+  let g=null;
+  thumb.addEventListener('pointerdown',e=>{ thumb.setPointerCapture(e.pointerId); g={y:e.clientY,t:parseFloat(thumb.style.top)||0}; e.preventDefault(); });
+  thumb.addEventListener('pointermove',e=>{ if(!g) return; const th=track.clientHeight, h=thumb.offsetHeight, maxT=th-h, maxS=view.scrollHeight-view.clientHeight; const t=clamp(g.t+e.clientY-g.y,0,maxT); view.scrollTop=maxT>0?t/maxT*maxS:0; });
+  const up=()=>{g=null;}; thumb.addEventListener('pointerup',up); thumb.addEventListener('pointercancel',up);
+  $('#sbMore').addEventListener('click',()=>{n=Math.min(n*2,480);fill();});
+  $('#sbLess').addEventListener('click',()=>{n=Math.max(Math.round(n/2),10);fill();});
+  fill(); window.addEventListener('resize',update);
+})();
+
+/* ---------- 1.3 multiplexing ---------- */
+(function(){
+  const names=['音量','亮度','對比','色溫'], vals=[40,70,50,30];
+  const sm=$('#spaceMux');
+  names.forEach((nm,i)=>{ const l=document.createElement('span'); l.textContent=nm; const r=document.createElement('input'); r.type='range'; r.min=0; r.max=100; r.value=vals[i]; r.setAttribute('aria-label',nm); const v=document.createElement('span'); v.textContent=vals[i]; r.addEventListener('input',()=>{v.textContent=r.value;}); sm.append(l,r,v); });
+  const tabs=$('#timeTabs'), sl=$('#timeSlider'), tv=$('#timeVal'), tr=$('#timeRead'); let cur=0, taps=0;
+  const tv2=[40,70,50,30];
+  names.forEach((nm,i)=>{ const b=document.createElement('button'); b.className='btn'+(i===0?' on':''); b.textContent=nm; b.addEventListener('click',()=>{ cur=i; taps++; sync(); $$('button',tabs).forEach((x,k)=>x.classList.toggle('on',k===i)); }); tabs.appendChild(b); });
+  function sync(){ sl.value=tv2[cur]; tv.textContent=tv2[cur]; tr.textContent='目前這根滑桿控制：「'+names[cur]+'」。已切換 '+taps+' 次。目前值：'+tv2.map((v,i)=>names[i]+' '+v).join('、'); }
+  sl.addEventListener('input',()=>{ tv2[cur]=+sl.value; sync(); });
+  sync();
+})();
+
+/* ---------- 2.1 spatial mapping ---------- */
+(function(){
+  const pad=$('#spPad'), scr=$('#spScr'), cur=$('#spCur'), tgt=$('#spTgt'), dot=$('#spDot');
+  let angle=0, T=null, t0=performance.now(), cp={x:0,y:0};
+  const S={0:{h:0,m:0,t:0},90:{h:0,m:0,t:0},180:{h:0,m:0,t:0}};
+  function place(px,py){
+    const pw=pad.clientWidth, sw=scr.clientWidth, sh=scr.clientHeight, k=sw/pw, a=angle*Math.PI/180;
+    const dx=px-pw/2, dy=py-pad.clientHeight/2;
+    const rx=dx*Math.cos(a)-dy*Math.sin(a), ry=dx*Math.sin(a)+dy*Math.cos(a);
+    cp={x:clamp(sw/2+rx*k,0,sw),y:clamp(sh/2+ry*k,0,sh)};
+    cur.style.transform='translate('+cp.x+'px,'+cp.y+'px)'; dot.style.left=px+'px'; dot.style.top=py+'px';
+  }
+  function newT(){ const sw=scr.clientWidth, sh=scr.clientHeight; T={x:rand(.2,.8)*sw,y:rand(.22,.78)*sh}; tgt.style.left=T.x+'px'; tgt.style.top=T.y+'px'; t0=performance.now(); }
+  function rows(){ $('#spStats').innerHTML='<tr><th>映射</th><th>命中</th><th>失誤</th><th>平均時間</th></tr>'+[0,90,180].map(a=>'<tr><td>'+(a===0?'一般':'+'+a+'°')+'</td><td>'+S[a].h+'</td><td>'+S[a].m+'</td><td>'+(S[a].h?(S[a].t/S[a].h/1000).toFixed(2)+' 秒':'-')+'</td></tr>').join(''); }
+  function loc(e){ const r=pad.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; }
+  pad.addEventListener('pointermove',e=>{ const p=loc(e); place(p[0],p[1]); });
+  pad.addEventListener('pointerdown',e=>{ const p=loc(e); place(p[0],p[1]); });
+  pad.addEventListener('click',e=>{ const p=loc(e); place(p[0],p[1]); const d=Math.hypot(cp.x-T.x,cp.y-T.y); if(d<=22){ S[angle].h++; S[angle].t+=performance.now()-t0; newT(); } else S[angle].m++; rows(); });
+  setTabs($('#spTabs'),b=>{angle=+b.dataset.a; place(pad.clientWidth/2,pad.clientHeight/2); newT();});
+  place(pad.clientWidth/2,pad.clientHeight/2); newT(); rows();
+})();
+
+/* ---------- 2.2 DOF cube ---------- */
+(function(){
+  const names=[['x',-100,100],['y',-100,100],['z',-100,100],['θx',-180,180],['θy',-180,180],['θz',-180,180]];
+  const box=$('#dofCtl'), cube=$('#cube'), v=[0,0,0,25,35,0], inputs=[], outs=[];
+  names.forEach((n,i)=>{ const l=document.createElement('span'); l.textContent=n[0]; const r=document.createElement('input'); r.type='range'; r.min=n[1]; r.max=n[2]; r.value=v[i]; r.setAttribute('aria-label',n[0]); const o=document.createElement('span'); o.textContent=v[i]; r.addEventListener('input',()=>{v[i]=+r.value;o.textContent=r.value;draw();}); box.append(l,r,o); inputs.push(r); outs.push(o); });
+  function draw(){ cube.style.transform='translate3d('+v[0]+'px,'+(-v[1])+'px,'+v[2]+'px) rotateX('+v[3]+'deg) rotateY('+v[4]+'deg) rotateZ('+v[5]+'deg)'; }
+  $('#dofMouse').addEventListener('change',e=>{ const on=e.target.checked; inputs.forEach((r,i)=>{ if(i>=2){ r.disabled=on; if(on){ v[i]=0; r.value=0; outs[i].textContent=0; } } }); draw(); });
+  draw();
+})();
+
+/* ---------- 2.2 integrality ---------- */
+(function(){
+  const cv=$('#intCv'), c=cv.getContext('2d'); let mode='mouse', pts=[], drawing=false, last=null;
+  const read=$('#intRead'), ex=$('#easX'), ey=$('#easY');
+  function clear(){ c.clearRect(0,0,cv.width,cv.height); c.strokeStyle='rgba(120,130,140,.35)'; c.lineWidth=1; c.beginPath(); c.moveTo(0,90); c.lineTo(320,90); c.stroke(); pts=[]; last=null; if(mode==='eas'){ ex.value=10; ey.value=90; last=[10,90]; pts=[[10,90]]; } }
+  function line(a,b){ c.strokeStyle=getComputedStyle(document.body).color; c.lineWidth=2; c.lineCap='round'; c.beginPath(); c.moveTo(a[0],a[1]); c.lineTo(b[0],b[1]); c.stroke(); }
+  function report(){ if(pts.length<2) return; const ys=pts.map(p=>p[1]), dev=Math.max(...ys)-Math.min(...ys); read.innerHTML=(mode==='mouse'?'整合型':'分離型')+'：垂直偏差 <b>'+dev.toFixed(0)+' px</b>（越小越像水平線）。'; }
+  function pos(e){ const r=cv.getBoundingClientRect(); return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]; }
+  cv.addEventListener('pointerdown',e=>{ if(mode!=='mouse') return; cv.setPointerCapture(e.pointerId); drawing=true; last=pos(e); pts=[last]; });
+  cv.addEventListener('pointermove',e=>{ if(!drawing) return; const p=pos(e); line(last,p); last=p; pts.push(p); report(); });
+  const end=()=>{drawing=false;}; cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end);
+  function easMove(){ if(!last) last=[+ex.value,+ey.value]; const p=[+ex.value,+ey.value]; line(last,p); last=p; pts.push(p); report(); }
+  ex.addEventListener('input',easMove); ey.addEventListener('input',easMove);
+  setTabs($('#intTabs'),b=>{ mode=b.dataset.m; $('#easCtl').style.display=mode==='eas'?'block':'none'; read.textContent=mode==='mouse'?'整合型：在畫布上按住並拖曳，試著畫出水平線。':'分離型：只動 X 旋鈕畫水平線；再試著用兩個旋鈕畫斜線，感受它有多難。'; clear(); });
+  $('#intClear').addEventListener('click',clear); clear();
+})();
+
+/* ---------- 2.3 CD gain ---------- */
+(function(){
+  const pad=$('#cdPad'), scr=$('#cdScr'), cur=$('#cdCur'), gR=$('#cdGain'), enh=$('#cdEnh'), read=$('#cdRead');
+  let cp={x:20,y:20}, last=null, lt=0, padMove=0, curMove=0, hits=0, miss=0;
+  function setCur(){ cur.style.transform='translate('+cp.x+'px,'+cp.y+'px)'; }
+  function gain(speed){ const g=+gR.value; return enh.checked? g*(0.3+Math.min(speed,3)*0.9): g; }
+  pad.addEventListener('pointermove',e=>{ const now=performance.now(); if(last){ const dx=e.clientX-last.x, dy=e.clientY-last.y, d=Math.hypot(dx,dy), dt=Math.max(1,now-lt), sp=d/dt, g=gain(sp);
+      cp.x=clamp(cp.x+dx*g,0,scr.clientWidth); cp.y=clamp(cp.y+dy*g,0,scr.clientHeight); padMove+=d; curMove+=d*g; setCur();
+      read.innerHTML='墊上累積移動 <b>'+padMove.toFixed(0)+'</b> px，游標累積 <b>'+curMove.toFixed(0)+'</b> px；目前瞬間增益 <b>'+g.toFixed(2)+'</b>；命中 '+hits+'、失誤 '+miss; }
+    last={x:e.clientX,y:e.clientY}; lt=now; });
+  pad.addEventListener('pointerleave',()=>{last=null;}); pad.addEventListener('pointerdown',e=>{last={x:e.clientX,y:e.clientY};lt=performance.now();});
+  pad.addEventListener('click',()=>{ const t=$('#cdTgt'); const tx=scr.clientWidth*0.8, ty=scr.clientHeight*0.5; if(Math.hypot(cp.x-tx,cp.y-ty)<=9) hits++; else miss++; read.innerHTML+='（選取結果：命中 '+hits+'、失誤 '+miss+'）'; });
+  $('#cdReset').addEventListener('click',()=>{cp={x:20,y:20};padMove=0;curMove=0;hits=0;miss=0;setCur();read.textContent='已歸位。';});
+  setCur();
+  /* chart */
+  const svg=$('#cdChart'), X0=44,X1=400,Y0=200,Y1=20, gMin=.4,gMax=4;
+  const gx=g=>X0+(g-gMin)/(gMax-gMin)*(X1-X0), ty=t=>Y0-clamp(t,0,4)/4*(Y0-Y1);
+  const gross=g=>1.5/g, fine=g=>0.4*Math.pow(g,1.2);
+  function path(f){ let d=''; for(let g=gMin;g<=gMax+.001;g+=.05){ d+=(d?'L':'M')+gx(g).toFixed(1)+' '+ty(f(g)).toFixed(1); } return d; }
+  svg.innerHTML='<line x1="'+X0+'" y1="'+Y0+'" x2="'+X1+'" y2="'+Y0+'" stroke="currentColor" opacity=".5"/><line x1="'+X0+'" y1="'+Y0+'" x2="'+X0+'" y2="'+Y1+'" stroke="currentColor" opacity=".5"/>'+
+   '<path d="'+path(gross)+'" fill="none" stroke="var(--control)" stroke-width="3"/><path d="'+path(fine)+'" fill="none" stroke="var(--display)" stroke-width="3"/><path d="'+path(g=>gross(g)+fine(g))+'" fill="none" stroke="currentColor" stroke-dasharray="5 4" opacity=".7"/>'+
+   '<text x="70" y="44" fill="var(--control)" font-size="12">粗定位時間（愈高增益愈快）</text><text x="250" y="130" fill="var(--display)" font-size="12">細定位時間</text><text x="250" y="190" fill="currentColor" font-size="11" opacity=".8">虛線：兩者合計</text>'+
+   '<text x="'+X0+'" y="222" fill="currentColor" font-size="12">低增益</text><text x="'+(X1-36)+'" y="222" fill="currentColor" font-size="12">高增益</text><text x="4" y="30" fill="currentColor" font-size="12">時間</text>'+
+   '<line id="cdMk" y1="'+Y1+'" y2="'+Y0+'" stroke="var(--bad)" stroke-width="2"/><circle id="cdDot" r="5" fill="var(--bad)"/><text id="cdTx" y="12" font-size="12" fill="var(--bad)"></text>';
+  function mark(){ const g=+gR.value; $('#cdG').textContent=g.toFixed(1); const x=gx(g); const mk=$('#cdMk',svg); mk.setAttribute('x1',x); mk.setAttribute('x2',x); const t=gross(g)+fine(g); const d=$('#cdDot',svg); d.setAttribute('cx',x); d.setAttribute('cy',ty(t)); const tx=$('#cdTx',svg); tx.setAttribute('x',clamp(x-60,4,300)); tx.textContent='增益 '+g.toFixed(1)+'：合計約 '+t.toFixed(2)+'（示意）'; }
+  gR.addEventListener('input',mark); mark();
+})();
+
+/* ---------- 3.1 drag and drop ---------- */
+(function(){
+  const dd=$('#dd'), f=$('#ddFile'), fo=$('#ddFolder'), tr=$('#ddTrash'), msg=$('#ddMsg'); let g=null;
+  f.addEventListener('pointerdown',e=>{ f.setPointerCapture(e.pointerId); const r=f.getBoundingClientRect(); g={dx:e.clientX-r.left,dy:e.clientY-r.top}; f.style.cursor='grabbing'; e.preventDefault(); });
+  f.addEventListener('pointermove',e=>{ if(!g) return; const r=dd.getBoundingClientRect(); f.style.left=clamp(e.clientX-r.left-g.dx,0,r.width-50)+'px'; f.style.top=clamp(e.clientY-r.top-g.dy,0,r.height-50)+'px'; });
+  function over(a,b){ const A=a.getBoundingClientRect(), B=b.getBoundingClientRect(); return !(A.right<B.left+10||A.left>B.right-10||A.bottom<B.top+10||A.top>B.bottom-10); }
+  const end=()=>{ if(!g) return; g=null; f.style.cursor='grab';
+    if(over(f,tr)){ tr.firstChild.textContent='🗑️'; msg.textContent='丟進垃圾桶：你不需要說明書就知道這代表「刪除」。垃圾桶這個隱喻讓抽象的刪除動作有了實體意義。'; reset(); }
+    else if(over(f,fo)){ msg.textContent='放進資料夾：就像把紙本文件歸檔。「檔案」與「資料夾」正是桌面隱喻。'; reset(); }
+    else msg.textContent='沒有放到目標上。再試一次。'; };
+  function reset(){ setTimeout(()=>{ f.style.left='20px'; f.style.top='30px'; },900); }
+  f.addEventListener('pointerup',end); f.addEventListener('pointercancel',end);
+})();
+
+/* ---------- 3.1 icon quiz ---------- */
+(function(){
+  const data=[
+    ['📄','新增文件','開啟一份空白文件',['開啟一份空白文件','列印文件','刪除文件']],
+    ['📂','開啟舊檔','開啟已存在的檔案',['開啟已存在的檔案','關閉視窗','搜尋']],
+    ['💾','儲存','儲存目前的文件（軟碟機的形象）',['儲存目前的文件','備份到雲端','複製文字']],
+    ['🖨️','列印','列印目前文件',['列印目前文件','掃描文件','傳真']],
+    ['🔍','預覽列印','預覽列印的版面',['放大畫面','預覽列印的版面','搜尋文字']],
+    ['✔️','拼字檢查','檢查拼字與文法',['檢查拼字與文法','完成任務','同意條款']]
+  ];
+  const box=$('#icons'), q=$('#iconQ');
+  data.forEach((d,i)=>{ const b=document.createElement('button'); b.className='btn'; b.textContent=d[0]; b.dataset.tip=d[1]; b.setAttribute('aria-label','圖示 '+(i+1)); b.addEventListener('click',()=>{
+    q.innerHTML='<p style="margin:6px 0"><b>你覺得這個圖示（'+d[0]+'）的功能是？</b></p>';
+    d[3].slice().sort(()=>Math.random()-.5).forEach(o=>{ const x=document.createElement('button'); x.className='btn opt'; x.textContent=o; x.addEventListener('click',()=>{ const ok=o===d[2]; x.classList.add(ok?'good':'bad'); x.textContent=(ok?'✔ ':'✘ ')+o+(ok?'':'（正解：'+d[2]+'）'); }); q.appendChild(x); });
+  }); box.appendChild(b); });
+  $('#ttOn').addEventListener('change',e=>box.classList.toggle('tooltip-on',e.target.checked));
+})();
+
+/* ---------- 3.1 fax models ---------- */
+(function(){
+  const impl=['對話框 1：選擇傳輸協定','對話框 2：設定解析度與壓縮格式','對話框 3：輸入數據機初始化字串','對話框 4：輸入收件人傳真號碼','對話框 5：確認封面頁範本','最後才能按「傳送」'];
+  const ment=['放入要傳的文件','撥號：輸入對方傳真號碼','按下「傳送」'];
+  const ul=$('#faxSteps'); function show(m){ ul.innerHTML=(m==='impl'?impl:ment).map(s=>'<li>'+s+'</li>').join(''); }
+  setTabs(ul.previousElementSibling,b=>show(b.dataset.m)); show('impl');
+})();
+
+/* ---------- 3.2 switch ---------- */
+(function(){
+  const pl=$('#swPlate'), bulb=$('#bulb'), rd=$('#swRead'); let up=true;
+  function reg(){ return $('input[name=reg]:checked').value; }
+  function sync(){ pl.classList.toggle('up',up); pl.classList.toggle('down',!up); const on=(reg()==='us')===up; bulb.classList.toggle('on',on); rd.textContent=(up?'開關朝上':'開關朝下')+'，在'+(reg()==='us'?'美國／加拿大':'英國')+'，燈是'+(on?'亮':'滅')+'的。位置與亮滅之間沒有物理類比，只是各地區長期的慣例。'; }
+  pl.addEventListener('click',()=>{up=!up;sync();}); pl.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();up=!up;sync();}});
+  $$('input[name=reg]').forEach(r=>r.addEventListener('change',sync)); sync();
+})();
+
+/* ---------- 3.2 knob & slider ---------- */
+(function(){
+  const kn=$('#knob'), bk=$('#barK'); let ang=-135;
+  function setK(a){ ang=clamp(a,-135,135); kn.style.transform='rotate('+ang+'deg)'; bk.style.height=((ang+135)/270*100)+'%'; }
+  kn.addEventListener('pointerdown',e=>{kn.setPointerCapture(e.pointerId);kn._g=true;}); kn.addEventListener('pointerup',()=>kn._g=false);
+  kn.addEventListener('pointermove',e=>{ if(!kn._g) return; const r=kn.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2; setK(Math.atan2(e.clientX-cx,-(e.clientY-cy))*180/Math.PI); });
+  setK(-135);
+  const vs=$('#vsl'), h=$('#vslH'), bs=$('#barS');
+  function setV(f){ f=clamp(f,0,1); h.style.top=((1-f)*100)+'%'; bs.style.height=(f*100)+'%'; }
+  function ev(e){ const r=vs.getBoundingClientRect(); setV(1-(e.clientY-r.top)/r.height); }
+  vs.addEventListener('pointerdown',e=>{vs.setPointerCapture(e.pointerId);vs._g=true;ev(e);}); vs.addEventListener('pointermove',e=>{if(vs._g)ev(e);}); vs.addEventListener('pointerup',()=>vs._g=false);
+  setV(.15);
+})();
+
+/* ---------- 3.2 elevator ---------- */
+(function(){
+  const panel=$('#elPanel'), task=$('#elTask'), st={a:{n:0,e:0,t:0},b:{n:0,e:0,t:0}}; let ver, want, t0;
+  function render(){ const rows=$('#elStats'); rows.innerHTML='<tr><th>版本</th><th>次數</th><th>錯誤</th><th>平均反應</th></tr>'+['a','b'].map(k=>'<tr><td>('+k+')</td><td>'+st[k].n+'</td><td>'+st[k].e+'</td><td>'+(st[k].n?Math.round(st[k].t/st[k].n)+' ms':'-')+'</td></tr>').join(''); }
+  function next(){ ver=pick(['a','b']); want=pick(['UP','DOWN']); const order=ver==='a'?['UP','DOWN']:['DOWN','UP']; panel.innerHTML=''; order.forEach(o=>{ const b=document.createElement('button'); b.textContent=o; b.addEventListener('click',()=>{ const rt=performance.now()-t0; const s=st[ver]; s.n++; s.t+=rt; if(o!==want) s.e++; render(); task.innerHTML=(o===want?'<span class="good">✔ 正確</span>':'<span class="bad">✘ 按錯了</span>')+'，下一題…'; setTimeout(next,700); }); panel.appendChild(b); }); task.innerHTML='請盡快按下 <b>'+want+'</b>（版本 ('+ver+')）'; t0=performance.now(); }
+  render(); next();
+})();
+
+/* ---------- 3.3 Word insert/overtype ---------- */
+(function(){
+  const box=$('#wd'), ovr=$('#wdOvr'), ban=$('#wdBan'), rd=$('#wdRead'), big=$('#wdBig');
+  let chars, cur, over, typed;
+  function reset(){ chars=[...'人機互動']; cur=2; over=true; typed=0; render(); rd.textContent='點選編輯區後直接打字（或按上面的按鈕）。有人先前已悄悄切換過模式。'; }
+  function render(){ let h=''; chars.forEach((c,i)=>{ if(i===cur) h+='<span class="caret'+(over?' blk':'')+'"></span>'; h+=c; }); if(cur>=chars.length) h+='<span class="caret"></span>'; box.innerHTML=h; ovr.classList.toggle('on',over); ban.style.display=(over&&big.checked)?'block':'none'; }
+  function type(ch){ if(over&&cur<chars.length) chars[cur]=ch; else chars.splice(cur,0,ch); cur++; typed++; render(); if(typed>=2){ const s=chars.join(''); rd.innerHTML=s==='人機電腦互動'?'<span class="good">成功：「人機電腦互動」。</span>':'<span class="bad">結果是「'+s+'」，「互動」被覆寫掉了！你有注意到右下角那個小小的 OVR 嗎？</span>'; } }
+  box.addEventListener('keydown',e=>{ if(e.ctrlKey||e.metaKey) return; if(e.key==='Insert'){over=!over;render();e.preventDefault();} else if(e.key==='ArrowLeft'){cur=Math.max(0,cur-1);render();e.preventDefault();} else if(e.key==='ArrowRight'){cur=Math.min(chars.length,cur+1);render();e.preventDefault();} else if(e.key==='Backspace'){ if(cur>0){chars.splice(cur-1,1);cur--;render();} e.preventDefault(); } else if(e.key.length===1){ type(e.key); e.preventDefault(); } });
+  $('#wdIns').addEventListener('click',()=>{over=!over;render();}); $('#wdTyp').addEventListener('click',()=>{type('電');type('腦');}); $('#wdRst').addEventListener('click',reset); big.addEventListener('change',render);
+  reset();
+})();
+
+/* ---------- 4.1 keyboard modes ---------- */
+(function(){
+  const keys=[{n:'a',s:'A',a:'æ'},{n:'s',s:'S',a:'ß'},{n:'7',s:'/',a:'{'},{n:'8',s:'(',a:'['},{n:'9',s:')',a:']'},{n:'0',s:'=',a:'}'}];
+  const st={shift:false,caps:false,alt:false}, out=$('#kbOut'), box=$('#kbKeys'); let text='';
+  function cp(k){ if(st.alt) return k.a; const letter=/[a-z]/.test(k.n); let up=st.shift; if(letter&&st.caps) up=!up; if(!letter&&st.caps) up=st.shift; return up?k.s:k.n; }
+  function render(){ box.innerHTML=''; keys.forEach(k=>{ const b=document.createElement('button'); b.className='mk'; b.innerHTML=cp(k)+'<small>'+k.n+' / '+k.s+' / '+k.a+'</small>'; b.addEventListener('click',()=>{ text+=cp(k); out.textContent=text; }); box.appendChild(b); }); $$('#kbMods button').forEach(b=>b.classList.toggle('on',st[b.dataset.m])); }
+  $$('#kbMods button').forEach(b=>b.addEventListener('click',()=>{ st[b.dataset.m]=!st[b.dataset.m]; render(); }));
+  $('#kbClr').addEventListener('click',()=>{text='';out.textContent='（點鍵盤上的鍵）';}); render();
+})();
+
+/* ---------- 4.2 vi ---------- */
+(function(){
+  const term=$('#viTerm'), rd=$('#viRead'), fb=$('#viFb'); let buf, cur, mode, log, cmds;
+  const hint={h:'左移',l:'右移',e:'跳到字尾',x:'刪除一個字元',o:'在下方開新行並進入插入模式',w:'下一個字',d:'刪除（等待下一個鍵）'};
+  function reset(){ buf=[...'Hi there']; cur=0; mode='cmd'; log=[]; cmds=0; render(); rd.textContent='也可以點上方黑色區域後用實體鍵盤打字。vi 一開始是「指令模式」，目前沒有任何回饋。'; }
+  function render(){ let s=buf.map((c,i)=>i===cur&&mode==='cmd'?'['+c+']':c).join(''); if(mode==='ins') s=buf.slice(0,cur).join('')+'|'+buf.slice(cur).join(''); term.innerHTML=s+'\n~\n~\n'+(fb.checked?'<span class="st">-- '+(mode==='ins'?'INSERT':'COMMAND')+' --</span>':'')+(log.length?'\n<span style="opacity:.7">'+log.slice(-4).join('\n')+'</span>':''); }
+  function key(k){
+    if(mode==='cmd'){
+      if(k==='i'){mode='ins';log.push('i → 進入插入模式');}
+      else if(k==='Escape'){log.push('Esc → 仍是指令模式');}
+      else { cmds++; if(k==='h') cur=Math.max(0,cur-1); else if(k==='l') cur=Math.min(buf.length-1,cur+1); else if(k==='x'){buf.splice(cur,1);cur=Math.min(cur,buf.length-1);} else if(k==='e') cur=buf.length-1; log.push('「'+k+'」被當成指令：'+(hint[k]||'（無作用或其他指令）')); }
+    } else {
+      if(k==='Escape'){mode='cmd';cur=Math.max(0,cur-1);log.push('Esc → 回到指令模式');}
+      else if(k==='Backspace'){ if(cur>0){buf.splice(cur-1,1);cur--;} }
+      else if(k.length===1){ buf.splice(cur,0,k); cur++; }
+    }
+    render(); if(cmds>0&&mode==='cmd') rd.innerHTML='<span class="bad">你打的 '+cmds+' 個字被當成指令了。文字沒有出現，甚至可能被刪掉。</span>'+(fb.checked?'':' 而且畫面沒有任何東西告訴你目前在哪個模式。'); }
+  term.addEventListener('keydown',e=>{ if(e.ctrlKey||e.metaKey||e.key==='Tab') return; e.preventDefault(); key(e.key); });
+  $('#viHello').addEventListener('click',()=>[...'hello'].forEach(key)); $('#viI').addEventListener('click',()=>key('i')); $('#viEsc').addEventListener('click',()=>key('Escape')); $('#viRst').addEventListener('click',reset); fb.addEventListener('change',render);
+  reset();
+})();
+
+/* ---------- 4.2 ppt modes ---------- */
+(function(){
+  const modes=['一般','大綱','投影片','瀏覽','放映'], box=$('#ppt'), rd=$('#pptRead'); let cur=0, prev=0;
+  function render(){ box.innerHTML=''; if(cur===4){ rd.innerHTML='放映中：軟按鈕消失了。只能按 <kbd>Esc</kbd> 離開。'; const b=document.createElement('button'); b.className='btn primary'; b.textContent='按 Esc'; b.addEventListener('click',esc); box.appendChild(b); return; }
+    modes.forEach((m,i)=>{ const b=document.createElement('button'); b.className='btn'+(i===cur?' on':''); b.textContent=m; b.addEventListener('click',()=>{ prev=cur; cur=i; render(); }); box.appendChild(b); }); rd.textContent='5 種模式 ×4＝20 種轉換。目前模式：'+modes[cur]+'。'; }
+  function esc(){ cur=prev; render(); }
+  render();
+})();
+
+/* ---------- 4.3 Navi key ---------- */
+(function(){
+  const states=[['主畫面','Menu','開啟主選單'],['來電','Answer','接聽電話'],['簡訊','Read','閱讀簡訊'],['鬧鐘','Snooze','貪睡'],['通話中','End','結束通話']];
+  const tabs=$('#phStates'), lab=$('#phLab'), st=$('#phSt'), rd=$('#phRead'), fb=$('#phFb'); let cur=0;
+  states.forEach((s,i)=>{ const b=document.createElement('button'); b.className='btn'+(i===0?' on':''); b.textContent=s[0]; b.addEventListener('click',()=>{cur=i;$$('button',tabs).forEach((x,k)=>x.classList.toggle('on',k===i));sync();}); tabs.appendChild(b); });
+  function sync(){ st.textContent='狀態：'+states[cur][0]; lab.textContent=fb.checked?states[cur][1]:''; }
+  $('#phNavi').addEventListener('click',()=>{ rd.innerHTML='執行：<b>'+states[cur][1]+'</b>（'+states[cur][2]+'）'+(fb.checked?'':'。但你預先看得出來嗎？沒有回饋，這顆鍵毫無線索。'); });
+  fb.addEventListener('change',sync); sync();
+})();
+
+/* ---------- 5.1 direct vs indirect ---------- */
+(function(){
+  const scr=$('#indScr'), kn=$('#indKn'), cur=$('#indCur'), pad=$('#indPad'), rd=$('#indRead');
+  let cp={x:20,y:20}, last=null, grab=false, m=0;
+  function kv(x){ return clamp((x-20)/(scr.clientWidth-40),0,1); }
+  function set(){ cur.style.transform='translate('+cp.x+'px,'+cp.y+'px)'; }
+  pad.addEventListener('pointerdown',e=>{ last={x:e.clientX,y:e.clientY}; pad.setPointerCapture(e.pointerId); const kx=kn.offsetLeft, ky=kn.offsetTop+13; if(Math.abs(cp.x-kx)<18&&Math.abs(cp.y-ky)<20){ grab=true; rd.textContent='已抓住滑塊。'; } });
+  pad.addEventListener('pointermove',e=>{ if(last===null){ last={x:e.clientX,y:e.clientY}; return; } const dx=(e.clientX-last.x)*1.4, dy=(e.clientY-last.y)*1.4; last={x:e.clientX,y:e.clientY}; cp.x=clamp(cp.x+dx,0,scr.clientWidth); cp.y=clamp(cp.y+dy,0,scr.clientHeight); set(); m++; if(grab){ const v=kv(cp.x); kn.style.left=(20+v*(scr.clientWidth-40))+'px'; scr.style.filter='brightness('+(0.5+v)+')'; rd.textContent='亮度 '+Math.round(v*100)+'%'; } });
+  const up=()=>{grab=false;}; pad.addEventListener('pointerup',up); pad.addEventListener('pointercancel',up); pad.addEventListener('pointerleave',()=>{if(!grab)last=null;});
+  set(); rd.textContent='需要：游標、映射、增益。';
+  const dsc=$('#dirScr'), dk=$('#dirKn'); let dg=false;
+  function dset(e){ const r=dsc.getBoundingClientRect(); const x=clamp(e.clientX-r.left-5,20,dsc.clientWidth-20); dk.style.left=x+'px'; const v=(x-20)/(dsc.clientWidth-40); dsc.style.filter='brightness('+(0.5+v)+')'; $('#dirRead').textContent='手指直接放在滑塊上：亮度 '+Math.round(v*100)+'%。不需要游標，也沒有 CD gain。'; }
+  dsc.addEventListener('pointerdown',e=>{dsc.setPointerCapture(e.pointerId);dg=true;dset(e);}); dsc.addEventListener('pointermove',e=>{if(dg)dset(e);}); dsc.addEventListener('pointerup',()=>dg=false);
+})();
+
+/* ---------- 5.2 fat finger ---------- */
+(function(){
+  const kb=$('#kb'), blob=$('#ffBlob'), bub=$('#ffBub'), rd=$('#ffRead'), sz=$('#ffSize'); let mode='direct', tentative=null, down=false, target='';
+  ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].forEach(row=>{ const r=document.createElement('div'); r.className='r'; [...row].forEach(ch=>{ const k=document.createElement('div'); k.className='key'; k.textContent=ch; r.appendChild(k); }); kb.appendChild(r); });
+  const keys=$$('.key',kb), S={direct:{n:0,ok:0},offset:{n:0,ok:0}};
+  function keyAt(x,y){ for(const k of keys){ const r=k.getBoundingClientRect(); if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom) return k; } return null; }
+  function newT(){ target=pick([...'QWERTYUIOPASDFGHJKLZXCVBNM']); $('#ffTarget').textContent=target; }
+  function table(){ $('#ffStats').innerHTML='<tr><th>模式</th><th>次數</th><th>選對</th><th>正確率</th></tr>'+['direct','offset'].map(m=>'<tr><td>'+(m==='direct'?'直接':'偏移＋離手')+'</td><td>'+S[m].n+'</td><td>'+S[m].ok+'</td><td>'+(S[m].n?Math.round(S[m].ok/S[m].n*100)+'%':'-')+'</td></tr>').join(''); }
+  function show(e){ const r=kb.getBoundingClientRect(), s=+sz.value; blob.style.display='block'; blob.style.width=blob.style.height=s+'px'; blob.style.left=(e.clientX-r.left)+'px'; blob.style.top=(e.clientY-r.top)+'px';
+    const k=keyAt(e.clientX,e.clientY); tentative=k; if(mode==='offset'&&k){ bub.style.display='block'; bub.textContent=k.textContent; bub.style.left=(e.clientX-r.left)+'px'; bub.style.top=(e.clientY-r.top-s/2-6)+'px'; } else bub.style.display='none'; }
+  function commit(k){ if(!k){ rd.textContent='沒有選到任何鍵。'; return; } const ok=k.textContent===target; S[mode].n++; if(ok) S[mode].ok++; rd.innerHTML='選到「'+k.textContent+'」，目標是「'+target+'」：'+(ok?'<span class="good">正確</span>':'<span class="bad">錯誤</span>'); table(); newT(); }
+  kb.addEventListener('pointerdown',e=>{ kb.setPointerCapture(e.pointerId); down=true; show(e); if(mode==='direct'){ const s=+sz.value/2.2; const k=keyAt(e.clientX+rand(-s,s),e.clientY+rand(-s,s)); commit(k); } });
+  kb.addEventListener('pointermove',e=>{ if(down) show(e); });
+  const up=()=>{ if(!down) return; down=false; if(mode==='offset') commit(tentative); blob.style.display='none'; bub.style.display='none'; };
+  kb.addEventListener('pointerup',up); kb.addEventListener('pointercancel',up);
+  setTabs($('#ffMode'),b=>{mode=b.dataset.m;}); newT(); table();
+})();
+
+/* ---------- 5.3 multi-touch map ---------- */
+(function(){
+  const box=$('#mapBox'), inn=$('#mapIn'), rd=$('#mapRead'), zs=$('#mapZ');
+  inn.innerHTML='<svg width="340" height="220" viewBox="0 0 340 220"><rect width="340" height="220" fill="#cfe6d0"/><path d="M0 150 Q80 120 150 160 T340 130 V220 H0Z" fill="#9ec9e8"/><path d="M20 40 H320 M60 0 V220 M200 0 V150" stroke="#f6f1d8" stroke-width="8" fill="none"/><path d="M0 90 L340 60" stroke="#e5b86b" stroke-width="6"/><circle cx="110" cy="60" r="8" fill="#c0392b"/><text x="122" y="64" font-size="14" fill="#222">台南</text><circle cx="230" cy="100" r="8" fill="#c0392b"/><text x="242" y="104" font-size="14" fill="#222">高雄</text><circle cx="60" cy="110" r="6" fill="#2b3a67"/><text x="70" y="114" font-size="12" fill="#222">安平</text></svg>';
+  let s=1,x=0,y=0; const P=new Map(), marks=new Map(); let d0=0,s0=1;
+  function apply(){ inn.style.transform='translate('+x+'px,'+y+'px) scale('+s+')'; zs.value=s; }
+  function zoomAt(ns,cx,cy){ ns=clamp(ns,.6,4); x=cx-(cx-x)*ns/s; y=cy-(cy-y)*ns/s; s=ns; apply(); }
+  const pos=e=>{const r=box.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};};
+  const cols=['#e74c3c','#3498db','#f1c40f','#2ecc71','#9b59b6','#e67e22'];
+  box.addEventListener('pointerdown',e=>{ box.setPointerCapture(e.pointerId); P.set(e.pointerId,pos(e)); const m=document.createElement('div'); m.className='tp'; m.style.background=cols[marks.size%cols.length]+'88'; box.appendChild(m); marks.set(e.pointerId,m); upd(e); if(P.size===2){ const a=[...P.values()]; d0=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y); s0=s; } });
+  box.addEventListener('pointermove',e=>{ if(!P.has(e.pointerId)) return; const p=pos(e), old=P.get(e.pointerId); P.set(e.pointerId,p);
+    if(P.size===1){ x+=p.x-old.x; y+=p.y-old.y; apply(); }
+    else if(P.size>=2){ const a=[...P.values()]; const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y), mx=(a[0].x+a[1].x)/2, my=(a[0].y+a[1].y)/2; if(d0>0) zoomAt(s0*d/d0,mx,my); }
+    upd(e); });
+  function upd(e){ const m=marks.get(e.pointerId); if(m){ const p=P.get(e.pointerId); if(p){m.style.left=p.x+'px';m.style.top=p.y+'px';} } rd.textContent='接觸點：'+P.size+'；縮放 '+s.toFixed(2)+'×'; }
+  function end(e){ P.delete(e.pointerId); const m=marks.get(e.pointerId); if(m){m.remove();marks.delete(e.pointerId);} d0=0; if(P.size===2){const a=[...P.values()]; d0=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y); s0=s;} rd.textContent='接觸點：'+P.size+'；縮放 '+s.toFixed(2)+'×'; }
+  box.addEventListener('pointerup',end); box.addEventListener('pointercancel',end);
+  box.addEventListener('wheel',e=>{ e.preventDefault(); const p=pos(e); zoomAt(s*(e.deltaY<0?1.1:.9),p.x,p.y); },{passive:false});
+  zs.addEventListener('input',()=>zoomAt(+zs.value,box.clientWidth/2,box.clientHeight/2)); apply();
+})();
+
+/* ---------- 5.3 tilt ---------- */
+(function(){
+  const arena=$('#arena'), ball=$('#ball'), zone=$('#zone'), ts=$('#tiltS'), tv=$('#tiltV'), rd=$('#tiltRead'); let gain=50, bx=40, zx=0, tilt=0, dwell=0, t0=performance.now(), sensor=false, visible=true, lastT=performance.now(), done=0;
+  const tabs=$('#gainTabs'); [25,50,100,200].forEach(g=>{ const b=document.createElement('button'); b.className='btn'+(g===50?' on':''); b.textContent='增益 '+g; b.addEventListener('click',()=>{gain=g;$$('button',tabs).forEach(x=>x.classList.toggle('on',x===b));}); tabs.appendChild(b); });
+  function newZone(){ const w=arena.clientWidth; zx=rand(60,w-60); zone.style.left=(zx-22)+'px'; t0=performance.now(); dwell=0; }
+  ts.addEventListener('input',()=>{tilt=+ts.value;tv.textContent=tilt+'°';});
+  new IntersectionObserver(es=>{visible=es[0].isIntersecting;}).observe(arena);
+  function loop(now){ const dt=Math.min(.05,(now-lastT)/1000); lastT=now; if(visible){ const w=arena.clientWidth; bx=clamp(bx+gain*tilt*0.15*dt,14,w-14); ball.style.left=bx+'px';
+      if(Math.abs(bx-zx)<22){ dwell+=dt; if(dwell>=0.6){ done++; rd.innerHTML='完成！增益 '+gain+'：用時 '+((now-t0)/1000).toFixed(1)+' 秒（第 '+done+' 次）。'; newZone(); } } else dwell=0; }
+    requestAnimationFrame(loop); }
+  requestAnimationFrame(loop); setTimeout(newZone,50);
+  $('#tiltSensor').addEventListener('click',async()=>{ try{ if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission){ const r=await DeviceOrientationEvent.requestPermission(); if(r!=='granted'){rd.textContent='未取得感測器權限。';return;} } if(!('DeviceOrientationEvent' in window)){rd.textContent='此裝置沒有方向感測器。';return;} window.addEventListener('deviceorientation',e=>{ if(e.gamma==null) return; sensor=true; tilt=clamp(Math.round(e.gamma),-40,40); ts.value=tilt; tv.textContent=tilt+'°'; }); rd.textContent='已啟用感測器：左右傾斜你的手機。'; }catch(err){ rd.textContent='無法使用感測器。請改用滑桿。'; } });
+})();
+
+/* ---------- 5.3 spatially aware ---------- */
+(function(){
+  const big=$('#saBig'), fr=$('#saFrame'), mini=$('#saMini');
+  mini.innerHTML=$('.big',big).innerHTML; mini.style.background=getComputedStyle($('.big',big)).background;
+  mini.style.backgroundImage=getComputedStyle($('.big',big)).backgroundImage;
+  function move(e){ const r=big.getBoundingClientRect(); const fx=clamp(e.clientX-r.left-75,0,r.width-150), fy=clamp(e.clientY-r.top-50,0,r.height-100); fr.style.left=fx+'px'; fr.style.top=fy+'px'; mini.style.transform='translate('+(-fx)+'px,'+(-fy)+'px) scale('+(r.width/900)+')'; }
+  big.addEventListener('pointermove',move); big.addEventListener('pointerdown',move);
+  fr.style.left='20px'; fr.style.top='20px'; mini.style.transform='translate(-20px,-20px) scale('+(340/900)+')';
+  const big0=$('.big',big); big0.style.transformOrigin='0 0'; big0.style.transform='scale('+(340/900)+')';
+})();
+
+/* ---------- 6.1 dialogs ---------- */
+(function(){
+  const dlg=$('#dlg'), rd=$('#dlgRead'); let m='save';
+  function render(){ const q=m==='save'?'Save changes?':'Discard changes?'; dlg.innerHTML='<div class="t">Edit</div><div class="b"><span style="font-size:26px">⚠️</span><span>'+q+'</span></div><div class="bt"><span class="def">Yes</span><span>No</span><span>Cancel</span></div>'; rd.textContent=''; }
+  function enter(){ rd.innerHTML=m==='save'?'<span class="good">✔ 已儲存，一切正常。</span> 因為「Save changes?」是大家早已預期的對話框。':'<span class="bad">✘ 變更被捨棄，資料遺失！</span> 重點不是預設值，而是使用者的期待被打破了。破碎的期待遲早造成錯誤。'; }
+  setTabs($('#dlgTabs'),b=>{m=b.dataset.m;render();}); $('#dlgEnter').addEventListener('click',enter); render();
+})();
+
+/* ---------- 6.1 caps lock ---------- */
+(function(){
+  const pwd=$('#pwd'), sim=$('#capSim'), hint=$('#capHint'), tip=$('#capTip'), rd=$('#pwdRead'); let fails=0;
+  function caps(e){ return sim.checked||(e&&e.getModifierState&&e.getModifierState('CapsLock')); }
+  function upd(e){ tip.style.display=(hint.checked&&caps(e))?'block':'none'; }
+  pwd.addEventListener('keydown',e=>{ if(e.key.length===1&&/[a-z]/i.test(e.key)&&sim.checked&&!e.ctrlKey&&!e.metaKey){ e.preventDefault(); pwd.value+=e.key===e.key.toLowerCase()?e.key.toUpperCase():e.key.toLowerCase(); } upd(e); });
+  pwd.addEventListener('keyup',upd); pwd.addEventListener('focus',()=>upd()); sim.addEventListener('change',()=>upd()); hint.addEventListener('change',()=>upd());
+  $('#pwdGo').addEventListener('click',()=>{ if(pwd.value==='hci2013'){ rd.innerHTML='<span class="good">登入成功。</span>'; fails=0; } else { fails++; rd.innerHTML='<span class="bad">密碼錯誤（第 '+fails+' 次）。</span>'+(fails>=3?' 再錯下去帳號可能被鎖住。這不是嚴重資料遺失，卻是不必要的麻煩，只要幾行程式就能避免。':''); } pwd.value=''; });
+})();
+
+/* ---------- 6.2 cost vs frequency ---------- */
+(function(){
+  const svg=$('#ceChart'), rd=$('#ceRead'), ts=$('#ceT');
+  const P=[
+    {n:'Discard changes',x:70,y:50,th:15,fx:'已成歷史',d:'高成本、低頻率。資料可能整份遺失，所以最早受到關注，幾乎所有現代系統都用一致的 Save changes? 對話框。'},
+    {n:'CAPS_LOCK',x:170,y:100,th:50,fx:'改善中',d:'成本中等：登入失敗、被鎖帳號，是個麻煩。愈來愈多系統加上一行彈出警示，但仍有些沒有。'},
+    {n:'Scrolling frenzy',x:290,y:160,th:75,fx:'多半受控',d:'拖曳選取時超出視窗邊界，從位置控制突然變成速度控制，可能暴衝。新軟體多已調校，但各應用程式實作不一。'},
+    {n:'Focus uncertainty',x:380,y:225,th:999,fx:'仍是一團亂',d:'成本很低（多一次點擊或兩次眼跳），但幾乎每分鐘都在發生，沒有一致的慣例，使用者無從形成期待。'}
+  ];
+  let h='<line x1="40" y1="260" x2="430" y2="260" stroke="currentColor" opacity=".5"/><line x1="40" y1="260" x2="40" y2="20" stroke="currentColor" opacity=".5"/><text x="46" y="276" font-size="12" fill="currentColor">頻率低</text><text x="380" y="276" font-size="12" fill="currentColor">頻率高</text><text x="2" y="30" font-size="12" fill="currentColor">成本高</text><text x="2" y="256" font-size="12" fill="currentColor">低</text>';
+  P.forEach((p,i)=>{ h+='<g class="pt" id="pt'+i+'" tabindex="0" role="button" aria-label="'+p.n+'"><circle cx="'+p.x+'" cy="'+p.y+'" r="10" fill="'+(i<3?'var(--control)':'var(--display)')+'"/><text x="'+(p.x+(i>1?-14:14))+'" y="'+(p.y+4)+'" font-size="13" fill="currentColor" text-anchor="'+(i>1?'end':'start')+'">'+p.n+'</text></g>'; });
+  svg.innerHTML=h;
+  function state(p,t){ if(t>=p.th) return {o:p.th<100&&p.th<30?.2:.45}; return {o:1}; }
+  function upd(){ const t=+ts.value; P.forEach((p,i)=>{ const o=state(p,t).o; $('#pt'+i,svg).style.opacity=o; }); }
+  P.forEach((p,i)=>{ const g=$('#pt'+i,svg); const f=()=>{ const t=+ts.value; rd.innerHTML='<b>'+p.n+'</b>：'+p.d+'<br><span class="note">目前狀態：'+(t>=p.th?p.fx:'尚未修好')+'</span>'; }; g.addEventListener('click',f); g.addEventListener('keydown',e=>{if(e.key==='Enter')f();}); });
+  ts.addEventListener('input',upd); upd();
+})();
+
+/* ---------- 6.3 focus advancement ---------- */
+(function(){
+  const fld=$$('#focFld div'), rd=$('#focRead'), pad=$('#focPad'); let seg, f, auto, lost, looks, shown, digits, t0, tmr;
+  for(let i=0;i<=9;i++){ const b=document.createElement('button'); b.className='btn'; b.textContent=i; b.addEventListener('click',()=>key(String(i))); pad.appendChild(b); }
+  function reset(){ seg=['','','']; f=0; auto=Math.random()<.5; lost=0; looks=0; digits=0; t0=performance.now(); clearTimeout(tmr); shown=false; render(); rd.textContent='開始輸入：9 8 0 1 2 3 4 5 6。你不知道系統會不會自動跳欄。'; }
+  function render(){ fld.forEach((d,i)=>{ d.textContent=seg[i]; d.classList.toggle('f',shown&&i===f); }); }
+  function key(k){ if(!/^\d$/.test(k)) return; digits++; if(seg[f].length<3){ seg[f]+=k; if(seg[f].length===3&&auto&&f<2) f++; } else lost++; render(); check(); }
+  function check(){ if(digits>=9||seg.join('').length===9){ finish(); } }
+  function finish(){ const sec=(performance.now()-t0)/1000, extra=looks*2*0.35; rd.innerHTML='完成。這次系統是<b>'+(auto?'會自動跳欄':'不會自動跳欄')+'</b>。<br>被丟掉的數字：<b>'+lost+'</b>；視線轉移：<b>'+looks+'</b> 次（以每次來回 2 次眼跳、約 0.35 秒估算，額外約 '+extra.toFixed(1)+' 秒）；總時間 '+sec.toFixed(1)+' 秒。<br>輸入結果：'+seg.join('-')+'（目標：980-123-456）'; }
+  $('#focLook').addEventListener('click',()=>{ looks++; shown=true; render(); rd.textContent='你看了螢幕：焦點在第 '+(f+1)+' 欄（視線轉移 '+looks+' 次）。'; clearTimeout(tmr); tmr=setTimeout(()=>{shown=false;render();},1800); });
+  $('#focTab').addEventListener('click',()=>{ if(f<2) f++; render(); });
+  $('#focRst').addEventListener('click',reset);
+  document.addEventListener('keydown',e=>{ if($('#c6-3').getBoundingClientRect().top>innerHeight||$('#c6-3').getBoundingClientRect().bottom<0) return; if(e.target.matches('input,textarea,select')||e.target.isContentEditable) return; if(/^\d$/.test(e.key)) key(e.key); else if(e.key==='Tab'&&e.target===document.body){ e.preventDefault(); if(f<2) f++; render(); } });
+  reset();
+})();
+
+})();
+</script>
+</body>
+</html>
